@@ -23,6 +23,41 @@ void menu_clientes(void) {
     printf("\n        Escolha uma opção: ");
 }
 
+void cadastrar_cliente(void) {
+    Cliente cli;
+    FILE* fp;
+    
+    limpar_tela();
+    printf("\n");
+    printf("        ╔══════════════════════════════════════════════════╗\n");
+    printf("        ║            CADASTRAR NOVO CLIENTE                ║\n");
+    printf("        ╚══════════════════════════════════════════════════╝\n\n");
+    
+    printf("        Nome completo: ");
+    ler_string(cli.nome, sizeof(cli.nome));
+    
+    printf("        Telefone: ");
+    ler_string(cli.telefone, sizeof(cli.telefone));
+    
+    printf("        Endereço completo: ");
+    ler_string(cli.endereco, sizeof(cli.endereco));
+    
+    cli.status = 1;
+    
+    fp = fopen(ARQUIVO_CLIENTES, "ab");
+    if (fp == NULL) {
+        printf("\n Erro ao abrir arquivo!\n");
+        pausar();
+        return;
+    }
+    
+    fwrite(&cli, sizeof(Cliente), 1, fp);
+    fclose(fp);
+    
+    printf("\n Cliente cadastrado com sucesso!\n");
+    pausar();
+}
+
 void cliente(void) {
     int opcao;
     
