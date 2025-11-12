@@ -5,4 +5,4 @@ all:
 	gcc -o sig-burger *.o
 
 clean:
-	rm -f *.o  sig-burger include/*.gch
+	rm -f *.o  sig-burger headers/*.gch
