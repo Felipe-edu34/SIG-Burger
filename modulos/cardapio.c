@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "utils.h"
+#include "cardapio.h"
 
 
 void menu_cardapio() {
@@ -19,6 +21,66 @@ void menu_cardapio() {
     printf("║                                                  ║\n");
     printf("╚══════════════════════════════════════════════════╝\n"); 
     printf("Escolha uma opção: ");
+
+}
+
+
+
+int gerar_codigo() {
+    FILE *arq;
+    int codigo = 1;
+
+    // tenta abrir o arquivo em modo leitura binária
+    arq = fopen("codigo.dat", "rb");
+
+    // se já existir, lê o último código
+    if (arq != NULL) {
+        fread(&codigo, sizeof(int), 1, arq);
+        fclose(arq);
+        codigo++; // incrementa para o próximo
+    }
+
+    // salva o novo código atualizado
+    arq = fopen("codigo.dat", "wb");
+    if (arq == NULL) {
+        printf("Erro ao abrir o arquivo de código.\n");
+        return -1;
+    }
+
+    fwrite(&codigo, sizeof(int), 1, arq);
+    fclose(arq);
+
+    return codigo;
+}
+
+
+
+void cadastrar_item_ao_cardapio() {
+
+    limpar_tela();
+    Itemcardapio* item = (Itemcardapio*) malloc(sizeof(Itemcardapio));
+
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║              CADASTRAR ITEM AO CARDÁPIO          ║\n");
+    printf("╚══════════════════════════════════════════════════╝\n");
+
+    item->codigo = gerar_codigo();
+
+    printf("► Nome do Item: ");
+    ler_string(item->nome, 50);
+
+    printf("► Categoria: ");
+    ler_string(item->categoria, 30);
+
+    printf("► Descrição: ");
+    ler_string(item->descricao, 100);
+
+    printf("► Preço (R$): ");
+    scanf("%f", &item->preco);
+
+    item->disponivel = 1;
+
+    
 
 }
 
