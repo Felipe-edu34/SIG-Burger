@@ -71,7 +71,7 @@ void gravar_item_estoque(Produto* prod){
 
 void cadastrar_produto(){
 
-    Produto* prod;
+    Produto* prod = (Produto*) malloc(sizeof(Produto));
     limpar_tela();
     printf("╔══════════════════════════════════════════════════╗\n");
     printf("║           CADASTRAR PRODUTO AO ESTOQUE           ║\n");
