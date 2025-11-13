@@ -181,7 +181,7 @@ void remover_produto() {
         prod->ativo = 0;
         fseek(arq, pos_arquivo, SEEK_SET);
         fwrite(prod, sizeof(Produto), 1, arq);
-        printf("\n✅ Produto removido com sucesso!\n");
+        printf("\n Produto removido com sucesso!\n");
     } else {
         printf("\nRemoção cancelada.\n");
     }
@@ -276,4 +276,126 @@ void editar_produto() {
 
     printf("\n Produto atualizado com sucesso!\n");
     pausar();
+}
+
+
+
+void pesquisar_produto() {
+    FILE *arq;
+    Produto *prod = (Produto*) malloc(sizeof(Produto));
+    int numero, contador = 0, encontrado = 0;
+
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║                 PESQUISAR PRODUTO                ║\n");
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+
+    arq = fopen(ARQUIVO_ESTOQUE, "rb");
+    if (arq == NULL) {
+        printf("Nenhum produto cadastrado ainda.\n");
+        free(prod);
+        pausar();
+        return;
+    }
+
+    printf("Produtos disponíveis:\n\n");
+    while (fread(prod, sizeof(Produto), 1, arq) == 1) {
+        if (prod->ativo == 1) {
+            contador++;
+            printf(" %d - %s  (Qtd: %d)\n", contador, prod->nome, prod->quantidade);
+        }
+    }
+    fclose(arq);
+
+    if (contador == 0) {
+        printf("\nNenhum produto ativo encontrado.\n");
+        free(prod);
+        pausar();
+        return;
+    }
+
+    printf("\nDigite o número do produto para ver detalhes: ");
+    scanf("%d", &numero);
+    limparBuffer();
+
+    if (numero < 1 || numero > contador) {
+        printf("\nNúmero inválido!\n");
+        free(prod);
+        pausar();
+        return;
+    }
+
+    arq = fopen(ARQUIVO_ESTOQUE, "rb");
+    contador = 0;
+    while (fread(prod, sizeof(Produto), 1, arq) == 1) {
+        if (prod->ativo == 1) {
+            contador++;
+            if (contador == numero) {
+                encontrado = 1; // marca que achou o item
+            }
+        }
+
+        if (encontrado) {
+            limpar_tela();
+            printf("╔══════════════════════════════════════════════════╗\n");
+            printf("║               DETALHES DO PRODUTO                ║\n");
+            printf("╚══════════════════════════════════════════════════╝\n\n");
+
+            printf("► Nome: %s\n", prod->nome);
+            printf("► Categoria: %s\n", prod->categoria);
+            printf("► Quantidade: %d\n", prod->quantidade);
+            printf("► Validade: %s\n", prod->validade);
+            printf("► Status: %s\n", prod->ativo ? "Ativo" : "Inativo");
+
+            printf("\n╚══════════════════════════════════════════════════╝\n");
+            encontrado = 2; // muda o estado para indicar que já mostrou
+        }
+    }
+
+    if (encontrado == 0) {
+        printf("\nProduto não encontrado.\n");
+    }
+
+    fclose(arq);
+    free(prod);
+    pausar();
+}
+
+
+
+void estoque() {
+    int opcao;
+
+    do {
+        menu_estoque();
+        scanf("%d", &opcao);
+        limparBuffer();
+
+        switch (opcao) {
+            case 1:
+                cadastrar_produto();
+                break;
+            case 2:
+                remover_produto();
+                break;
+            case 3:
+                editar_produto();
+                break;
+            case 4:
+                pesquisar_produto();
+                break;
+            case 5:
+                exibir_estoque();
+                break;
+            case 0:
+                printf("\nVoltando ao Menu Principal...\n");
+                pausar();
+                break;
+            default:
+                printf("\nOpção inválida! Tente novamente.\n");
+                pausar();
+                break;
+        }
+
+    } while (opcao != 0);
 }
