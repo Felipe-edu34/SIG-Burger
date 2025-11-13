@@ -29,7 +29,7 @@ int confirma_dados_estoque(Produto* prod) {
     char confirm;
     limpar_tela();
     exibir_item(prod);
-    printf("Os dados do item novo do cardapio estão corretos? (S/N): ");
+    printf("Os dados do item novo do estoque estão corretos? (S/N): ");
     scanf(" %c", &confirm);
     limparBuffer();
 
@@ -104,7 +104,7 @@ void cadastrar_item(){
     }
 
     gravar_produto(prod);
-    printf("\n✅ Produto cadastrado com sucesso!\n");
+    printf("\n Produto cadastrado com sucesso!\n");
     pausar();
 }
 
