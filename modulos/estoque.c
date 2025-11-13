@@ -25,11 +25,54 @@ void menu_estoque(){
 
 
 
-void cadastrar_item(){
-    void cadastrar_produto() {
+int confirma_dados_estoque(Produto* prod) {
+    char confirm;
     limpar_tela();
-    Produto* prod;
+    exibir_item(prod);
+    printf("Os dados do item novo do cardapio estão corretos? (S/N): ");
+    scanf(" %c", &confirm);
+    limparBuffer();
 
+    if (confirm == 'S' || confirm == 's') {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+
+
+void exibir_item_estoque(Produto* prod){
+
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║             ITEM CADASTRADO (VISUALIZAÇÃO)       ║\n");
+    printf("╠══════════════════════════════════════════════════╣\n");
+    printf("║ Nome:        %s\n", prod->nome);
+    printf("║ Categoria:   %s\n", prod->categoria);
+    printf("║ quantidade:   %i\n", prod->quantidade);
+    printf("║ validade:       %s\n", prod->validade);
+    printf("╚══════════════════════════════════════════════════╝\n");
+}
+
+
+
+void gravar_item_estoque(Produto* prod){
+
+
+    FILE *arq_item = fopen(ARQUIVO_ESTOQUE, "ab");              // Abre o arquivo em modo anexar (append)
+    if (arq_item == NULL) {
+        return;
+    }
+
+    fwrite(prod, sizeof(Produto), 1, arq_item);
+    fclose(arq_item);
+}
+
+
+void cadastrar_item(){
+
+    Produto* prod;
+    limpar_tela();
     printf("╔══════════════════════════════════════════════════╗\n");
     printf("║           CADASTRAR PRODUTO AO ESTOQUE           ║\n");
     printf("╚══════════════════════════════════════════════════╝\n\n");
@@ -41,7 +84,7 @@ void cadastrar_item(){
     ler_string(prod->categoria, sizeof(prod->categoria));
 
     printf("► Quantidade inicial: ");
-    if (scanf("%d", &prod->quantidade) != 1 || produto->quantidade < 0) {
+    if (scanf("%d", &prod->quantidade) != 1 || prod->quantidade < 0) {
         limparBuffer();
         printf("\nQuantidade inválida.\n");
         pausar();
@@ -65,4 +108,3 @@ void cadastrar_item(){
     pausar();
 }
 
-}
