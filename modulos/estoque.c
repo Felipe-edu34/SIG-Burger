@@ -28,7 +28,7 @@ void menu_estoque(){
 int confirma_dados_estoque(Produto* prod) {
     char confirm;
     limpar_tela();
-    exibir_item(prod);
+    exibir_item_estoque(prod);
     printf("Os dados do item novo do estoque estão corretos? (S/N): ");
     scanf(" %c", &confirm);
     limparBuffer();
@@ -69,7 +69,7 @@ void gravar_item_estoque(Produto* prod){
 }
 
 
-void cadastrar_item(){
+void cadastrar_produto(){
 
     Produto* prod;
     limpar_tela();
@@ -97,13 +97,13 @@ void cadastrar_item(){
 
     prod->ativo = 1;
 
-    if (!confirma_dados_produto(prod)) {
+    if (!confirma_dados_estoque(prod)) {
         printf("\nCadastro cancelado pelo usuário.\n");
         pausar();
         return;
     }
 
-    gravar_produto(prod);
+    gravar_item_estoque(prod);
     printf("\n Produto cadastrado com sucesso!\n");
     pausar();
 }
@@ -383,9 +383,6 @@ void estoque() {
                 break;
             case 4:
                 pesquisar_produto();
-                break;
-            case 5:
-                exibir_estoque();
                 break;
             case 0:
                 printf("\nVoltando ao Menu Principal...\n");
