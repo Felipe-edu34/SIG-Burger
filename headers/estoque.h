@@ -10,5 +10,14 @@ typedef struct {
 } Produto;
 
 void menu_estoque();
+void estoque();
+void pesquisar_produto();
+void editar_produto();
+void remover_produto();
+void cadastrar_produto();
+void gravar_item_estoque(Produto* prod);
+void exibir_item_estoque(Produto* prod);
+int confirma_dados_estoque(Produto* prod);
+
 
 #endif 
