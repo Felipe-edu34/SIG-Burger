@@ -3,6 +3,7 @@
 #include <string.h>
 #include "utils.h"
 #include "estoque.h"
+#include "leitura.h"
 
 #define ARQUIVO_ESTOQUE "estoque.dat"
 
