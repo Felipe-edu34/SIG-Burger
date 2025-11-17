@@ -269,6 +269,35 @@ void exibir_itens_indisponiveis() {
 }
 
 
+
+void exibir_itens_por_categoria() {
+    char categoria_lida[30];
+    Produto* prod = (Produto*) malloc(sizeof(Produto));
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║          PROCURAR ITEM POR CATEGORIA             ║\n");
+    printf("╚══════════════════════════════════════════════════╝\n");
+    
+    printf("digite a categoria dos item que voce quer ver: ");
+    ler_string(categoria_lida, 30);
+
+    FILE* arq_estoque = fopen("item_estoque.dat","rb");
+    if (arq_estoque == NULL) {
+        printf("Erro ao abrir o arquivo de estoque.\n");
+        limparBuffer();
+        return;
+    }
+    while (fread(prod, sizeof(Produto), 1, arq_estoque) == 1) {
+        if (strstr(prod->categoria, categoria_lida) != NULL) {
+            exibir_item_estoque(prod);
+        }
+    }
+    fclose(arq_estoque);
+    free(prod);
+    pausar();
+}
+
+
 void relatorio_estoque() {
     limpar_tela();
     printf("╔══════════════════════════════════════════════════╗\n");
