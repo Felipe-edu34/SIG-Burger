@@ -243,6 +243,32 @@ void exibir_itens_com_baixa_quantidade() {
 
 
 
+void exibir_itens_indisponiveis() {
+    
+    Produto* prod = (Produto*) malloc(sizeof(Produto));
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║        ITENS INDISPONIVEIS NO ESTOQUE            ║\n");
+    printf("╚══════════════════════════════════════════════════╝\n");
+
+    FILE* arq_estoque = fopen("item_estoque.dat","rb");
+    if (arq_estoque == NULL) {
+        printf("Erro ao abrir o arquivo de estoque.\n");
+        limparBuffer();
+        return;
+    }
+
+    while (fread(prod, sizeof(Produto), 1, arq_estoque) == 1) {
+        if(prod->ativo == 0){
+        exibir_item_estoque(prod);
+        }
+    }
+    fclose(arq_estoque);
+    free(prod);
+    pausar();
+}
+
+
 void relatorio_estoque() {
     limpar_tela();
     printf("╔══════════════════════════════════════════════════╗\n");
