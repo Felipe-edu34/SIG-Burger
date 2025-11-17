@@ -39,3 +39,19 @@ int valida_data(const char* data) {
     }
     return 1;
 }
+
+
+int valida_categoria(const char* categoria) {
+    int i;
+    int tamanho = strlen(categoria);             //função para validar categoria
+    if (tamanho < 3) {
+        return 0;
+    }
+    for (i = 0; i < tamanho; i++) {
+        if (!((categoria[i] >= 'A' && categoria[i] <= 'Z') || (categoria[i] >= 'a' && categoria[i] <= 'z') || categoria[i] == ' ')) {
+            return 0;
+        }
+    }
+    return 1;
+
+}
