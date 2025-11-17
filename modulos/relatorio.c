@@ -243,7 +243,7 @@ void exibir_itens_com_baixa_quantidade() {
 
 
 
-void exibir_itens_indisponiveis() {
+void exibir_itens_indisponiveis_estoque() {
     
     Produto* prod = (Produto*) malloc(sizeof(Produto));
     limpar_tela();
@@ -316,7 +316,8 @@ void relatorio_estoque() {
 
 
 void relatorio() {
-    int opcao;
+    int opcao, opcao_estoque, opcao_cardapio;
+    
 
     do {
         menu_relatorio();
@@ -325,33 +326,66 @@ void relatorio() {
 
         switch (opcao) {
             case 1:
-                printf("Relatório de Cardápio selecionado.\n");
-                // Chamar função do módulo Cardápio
+                do {
+                    relatorio_cardapio();
+                    scanf("%d", &opcao_cardapio);
+                    limparBuffer();
+
+                    switch (opcao_cardapio) {
+                        case 1:
+                            exibir_cardapio_relatorio();
+                            break;
+                        case 2:
+                            relatorio_cardapio_itens_disponiveis();
+                            break;
+                        case 3:
+                            exibir_itens_indisponiveis();
+                            break;
+                        case 4:
+                            procurar_item_por_categoria();
+                            break;
+                        case 0:
+                            printf("Voltando ao Menu de Relatórios...\n");
+                            break;
+                        default:
+                            printf("Opção inválida! Tente novamente.\n");
+                    }
+                } while (opcao_cardapio != 0);
                 break;
+
             case 2:
-                printf("Relatório de Estoque selecionado.\n");
-                // Chamar função do módulo Estoque
-                break;
-            case 3:
-                printf("Relatório de Clientes selecionado.\n");
-                // Chamar função do módulo Clientes
-                break;
-            case 4:
-                printf("Relatório de Pedidos selecionado.\n");
-                // Chamar função do módulo Pedidos
-                break;
-            case 5:
-                printf("Relatório Financeiro selecionado.\n");
-                // Chamar função do módulo Financeiro
+                do {
+                    relatorio_estoque();
+                    scanf("%d", &opcao_estoque);
+                    limparBuffer();
+
+                    switch (opcao_estoque) {
+                        case 1:
+                            exibir_todo_o_estoque();
+                            break;
+                        case 2:
+                            exibir_itens_com_baixa_quantidade();
+                            break;
+                        case 3:
+                            exibir_itens_indisponiveis();
+                            break;
+                        case 4:
+                            exibir_itens_por_categoria();
+                            break;
+                        case 0:
+                            printf("Voltando ao Menu de Relatórios...\n");
+                            break;
+                        default:
+                            printf("Opção inválida! Tente novamente.\n");
+                    }
+                } while (opcao_estoque != 0);
                 break;
             case 0:
-                printf("\nVoltando ao Menu Principal...\n");
-                pausar();
+                printf("Voltando ao Menu Principal...\n");
                 break;
             default:
-                printf("\nOpção inválida! Tente novamente.\n");
-                pausar();
-                break;
+                printf("Opção inválida! Tente novamente.\n");
         }
+        pausar();
     } while (opcao != 0);
 }
