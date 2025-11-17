@@ -22,3 +22,20 @@ int valida_nome(const char* nome) {
     return 1;
 
 }
+
+
+
+int valida_data(const char* data) {
+    int dia, mes, ano;
+    if (sscanf(data, "%2d/%2d/%4d", &dia, &mes, &ano) != 3) {
+        return 0;
+    }
+    if (ano < 1900 || mes < 1 || mes > 12 || dia < 1) {
+        return 0;
+    }
+    int dias_no_mes[] = {31, (ano % 4 == 0 && (ano % 100 != 0 || ano % 400 == 0)) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    if (dia > dias_no_mes[mes - 1]) {
+        return 0;
+    }
+    return 1;
+}
