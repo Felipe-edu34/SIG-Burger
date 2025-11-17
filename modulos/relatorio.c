@@ -270,16 +270,16 @@ void exibir_itens_indisponiveis_estoque() {
 
 
 
-void exibir_itens_por_categoria() {
-    char categoria_lida[30];
+void exibir_itens_por_nome() {
+    char nome_lido[30];
     Produto* prod = (Produto*) malloc(sizeof(Produto));
     limpar_tela();
     printf("╔══════════════════════════════════════════════════╗\n");
-    printf("║          PROCURAR ITEM POR CATEGORIA             ║\n");
+    printf("║          PROCURAR ITEM POR NOME                   ║\n");
     printf("╚══════════════════════════════════════════════════╝\n");
     
-    printf("digite a categoria dos item que voce quer ver: ");
-    ler_string(categoria_lida, 30);
+    printf("digite o nome dos item que voce quer ver: ");
+    ler_string(nome_lido, 30);
 
     FILE* arq_estoque = fopen("item_estoque.dat","rb");
     if (arq_estoque == NULL) {
@@ -288,7 +288,7 @@ void exibir_itens_por_categoria() {
         return;
     }
     while (fread(prod, sizeof(Produto), 1, arq_estoque) == 1) {
-        if (strstr(prod->categoria, categoria_lida) != NULL) {
+        if (strstr(prod->nome, nome_lido) != NULL) {
             exibir_item_estoque(prod);
         }
     }
