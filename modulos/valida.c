@@ -55,3 +55,25 @@ int valida_categoria(const char* categoria) {
     return 1;
 
 }
+
+
+
+int valida_descricao(const char* descricao) {
+    int tamanho = strlen(descricao);             //função para validar descrição
+    if (tamanho < 5) {
+        return 0;
+    }
+    return 1;
+}
+
+
+
+int valida_preco(float* preco) {
+    if (*preco < 0) {
+        return 0;
+    }
+
+    return 1;
+}
+
+
