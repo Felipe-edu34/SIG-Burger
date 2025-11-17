@@ -11,5 +11,6 @@ void exibir_todo_o_estoque();
 void exibir_itens_com_baixa_quantidade();
 void exibir_itens_indisponiveis_estoque();
 void exibir_itens_indisponiveis();
+void exibir_itens_por_nome();
 
 #endif // RELATORIO_H
