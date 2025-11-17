@@ -154,7 +154,7 @@ void procurar_item_por_categoria() {
     printf("digite a categoria dos item que voce quer ver: ");
     ler_string(categoria_lida, 15);
 
-
+    limpar_tela();
     FILE* arq_cardapio = fopen("item_cardapio.dat","rb");
     if (arq_cardapio == NULL) {
         printf("Erro ao abrir o arquivo de cardapio.\n");
@@ -188,6 +188,7 @@ void relatorio_cardapio() {
     printf("║ ► 4. procurar item por categoria                 ║\n");
     printf("║                                                  ║\n");
     printf("╚══════════════════════════════════════════════════╝\n");
+    printf("Escolha uma opção: ");
     
 }
 
@@ -285,6 +286,7 @@ void exibir_itens_por_nome() {
     printf("digite o nome dos item que voce quer ver: ");
     ler_string(nome_lido, 30);
 
+    limpar_tela();
     FILE* arq_estoque = fopen("estoque.dat","rb");
     if (arq_estoque == NULL) {
         printf("Erro ao abrir o arquivo de estoque.\n");
@@ -315,6 +317,7 @@ void relatorio_estoque() {
     printf("║ ► 4. Itens por nome                              ║\n");
     printf("║                                                  ║\n");
     printf("╚══════════════════════════════════════════════════╝\n");
+    printf("Escolha uma opção: ");
     
 }   
 
