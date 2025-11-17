@@ -116,7 +116,8 @@ void relatorio_cardapio_itens_disponiveis() {
 }
 
 
-void exibir_itens_indisponiveis() {
+
+void relatorio_cardapio_itens_indisponiveis() {
    limpar_tela();
     printf("╔══════════════════════════════════════════════════╗\n");
     printf("║           ITEM INDISPONIVEIS NO CARDAPIO         ║\n");
@@ -171,7 +172,6 @@ void procurar_item_por_categoria(){
 
 
 
-
 void relatorio_cardapio() {
     limpar_tela();
     printf("╔══════════════════════════════════════════════════╗\n");
@@ -197,7 +197,7 @@ void exibir_todo_o_estoque(){
     printf("║          EXIBIR TODOS OS ITENS DO ESTOQUE        ║\n");
     printf("╚══════════════════════════════════════════════════╝\n");
 
-    FILE* arq_estoque = fopen("item_estoque.dat","rb");
+    FILE* arq_estoque = fopen("estoque.dat","rb");
     if (arq_estoque == NULL) {
         printf("Erro ao abrir o arquivo de estoque.\n");
         limparBuffer();
@@ -224,7 +224,7 @@ void exibir_itens_com_baixa_quantidade() {
     printf("║        ITENS COM BAIXA QUANTIDADE NO ESTOQUE     ║\n");
     printf("╚══════════════════════════════════════════════════╝\n");
 
-    FILE* arq_estoque = fopen("item_estoque.dat","rb");
+    FILE* arq_estoque = fopen("estoque.dat","rb");
     if (arq_estoque == NULL) {
         printf("Erro ao abrir o arquivo de estoque.\n");
         limparBuffer();
@@ -251,7 +251,7 @@ void exibir_itens_indisponiveis_estoque() {
     printf("║        ITENS INDISPONIVEIS NO ESTOQUE            ║\n");
     printf("╚══════════════════════════════════════════════════╝\n");
 
-    FILE* arq_estoque = fopen("item_estoque.dat","rb");
+    FILE* arq_estoque = fopen("estoque.dat","rb");
     if (arq_estoque == NULL) {
         printf("Erro ao abrir o arquivo de estoque.\n");
         limparBuffer();
@@ -281,7 +281,7 @@ void exibir_itens_por_nome() {
     printf("digite o nome dos item que voce quer ver: ");
     ler_string(nome_lido, 30);
 
-    FILE* arq_estoque = fopen("item_estoque.dat","rb");
+    FILE* arq_estoque = fopen("estoque.dat","rb");
     if (arq_estoque == NULL) {
         printf("Erro ao abrir o arquivo de estoque.\n");
         limparBuffer();
@@ -298,6 +298,7 @@ void exibir_itens_por_nome() {
 }
 
 
+
 void relatorio_estoque() {
     limpar_tela();
     printf("╔══════════════════════════════════════════════════╗\n");
@@ -307,7 +308,7 @@ void relatorio_estoque() {
     printf("║ ► 1. exibir estoque completo                     ║\n");
     printf("║ ► 2. Itens com baixa quantidade                  ║\n");
     printf("║ ► 3. Itens indisponíveis                         ║\n");
-    printf("║ ► 4. Itens por categoria                         ║\n");
+    printf("║ ► 4. Itens por nome                              ║\n");
     printf("║                                                  ║\n");
     printf("╚══════════════════════════════════════════════════╝\n");
     
@@ -339,7 +340,7 @@ void relatorio() {
                             relatorio_cardapio_itens_disponiveis();
                             break;
                         case 3:
-                            exibir_itens_indisponiveis();
+                            relatorio_cardapio_itens_indisponiveis();
                             break;
                         case 4:
                             procurar_item_por_categoria();
@@ -367,7 +368,7 @@ void relatorio() {
                             exibir_itens_com_baixa_quantidade();
                             break;
                         case 3:
-                            exibir_itens_indisponiveis();
+                            exibir_itens_indisponiveis_estoque();
                             break;
                         case 4:
                             exibir_itens_por_nome();
