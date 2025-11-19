@@ -104,3 +104,46 @@ void cadastrar_transacao() {
     free(trans);
     pausar();
 }
+
+void listar_transacoes() {
+    FILE *arq;
+    Transacao trans;
+    int contador = 0;
+
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║              LISTA DE TRANSAÇÕES                 ║\n");
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+
+    arq = fopen(ARQUIVO_FINANCEIRO, "rb");
+    if (arq == NULL) {
+        printf("Nenhuma transação cadastrada ainda.\n");
+        pausar();
+        return;
+    }
+
+    printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+
+    while (fread(&trans, sizeof(Transacao), 1, arq) == 1) {
+        if (trans.ativo == 1) {
+            contador++;
+            printf("Transação %d\n", contador);
+            printf("Tipo: %s\n", trans.tipo);
+            printf("Descrição: %s\n", trans.descricao);
+            printf("Categoria: %s\n", trans.categoria);
+            printf("Valor: R$ %.2f\n", trans.valor);
+            printf("Data: %s\n", trans.data);
+            printf("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+        }
+    }
+
+    fclose(arq);
+
+    if (contador == 0) {
+        printf("Nenhuma transação ativa encontrada.\n");
+    } else {
+        printf("Total de transações: %d\n", contador);
+    }
+
+    pausar();
+}
