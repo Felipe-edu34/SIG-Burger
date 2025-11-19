@@ -22,3 +22,18 @@ void menu_financeiro() {
     printf("╚══════════════════════════════════════════════════╝\n");
     printf("Escolha uma opção: ");
 }
+
+int confirma_dados_transacao(Transacao* trans) {
+    char confirm;
+    limpar_tela();
+    exibir_transacao(trans);
+    printf("\nOs dados da transação estão corretos? (S/N): ");
+    scanf(" %c", &confirm);
+    limparBuffer();
+
+    if (confirm == 'S' || confirm == 's') {
+        return 1;
+    } else {
+        return 0;
+    }
+}
