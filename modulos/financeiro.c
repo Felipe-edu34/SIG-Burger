@@ -147,3 +147,92 @@ void listar_transacoes() {
 
     pausar();
 }
+
+void editar_transacao() {
+    FILE *arq;
+    Transacao trans;
+    int numero, contador = 0;
+    long pos_arquivo;
+
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║               EDITAR TRANSAÇÃO                   ║\n");
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+
+    arq = fopen(ARQUIVO_FINANCEIRO, "rb");
+    if (arq == NULL) {
+        printf("Nenhuma transação cadastrada ainda.\n");
+        pausar();
+        return;
+    }
+
+    printf("Transações cadastradas:\n\n");
+    while (fread(&trans, sizeof(Transacao), 1, arq) == 1) {
+        if (trans.ativo == 1) {
+            contador++;
+            printf(" %d - %s - %s (R$ %.2f)\n",
+                   contador, trans.tipo, trans.descricao, trans.valor);
+        }
+    }
+    fclose(arq);
+
+    if (contador == 0) {
+        printf("\nNenhuma transação ativa encontrada.\n");
+        pausar();
+        return;
+    }
+
+    printf("\nDigite o número da transação: ");
+    scanf("%d", &numero);
+    limparBuffer();
+
+    if (numero < 1 || numero > contador) {
+        printf("\nNúmero inválido!\n");
+        pausar();
+        return;
+    }
+
+    arq = fopen(ARQUIVO_FINANCEIRO, "r+b");
+    contador = 0;
+    while (fread(&trans, sizeof(Transacao), 1, arq) == 1) {
+        if (trans.ativo == 1) {
+            contador++;
+            if (contador == numero) {
+                pos_arquivo = ftell(arq) - sizeof(Transacao);
+                break;
+            }
+        }
+    }
+
+    printf("\nEditando transação: %s\n", trans.descricao);
+    printf("----------------------------------------------------\n");
+
+    printf("► Nova Descrição: ");
+    ler_string(trans.descricao, sizeof(trans.descricao));
+
+    printf("► Novo Tipo (Receita/Despesa): ");
+    ler_string(trans.tipo, sizeof(trans.tipo));
+
+    printf("► Nova Categoria: ");
+    ler_string(trans.categoria, sizeof(trans.categoria));
+
+    printf("► Novo Valor (R$): ");
+    if (scanf("%f", &trans.valor) != 1) {
+        limparBuffer();
+        printf("Valor inválido.\n");
+        fclose(arq);
+        pausar();
+        return;
+    }
+    limparBuffer();
+
+    printf("► Nova Data (DD/MM/AAAA): ");
+    ler_string(trans.data, sizeof(trans.data));
+
+    fseek(arq, pos_arquivo, SEEK_SET);
+    fwrite(&trans, sizeof(Transacao), 1, arq);
+    fclose(arq);
+
+    printf("\n Transação atualizada com sucesso!\n");
+    pausar();
+}
