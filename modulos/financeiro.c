@@ -236,3 +236,79 @@ void editar_transacao() {
     printf("\n Transação atualizada com sucesso!\n");
     pausar();
 }
+
+void excluir_transacao() {
+    FILE *arq;
+    Transacao trans;
+    int numero, contador = 0;
+    long pos_arquivo;
+    char confirma;
+
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║              EXCLUIR TRANSAÇÃO                   ║\n");
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+
+    arq = fopen(ARQUIVO_FINANCEIRO, "rb");
+    if (arq == NULL) {
+        printf("Nenhuma transação cadastrada ainda.\n");
+        pausar();
+        return;
+    }
+
+    printf("Transações cadastradas:\n\n");
+    while (fread(&trans, sizeof(Transacao), 1, arq) == 1) {
+        if (trans.ativo == 1) {
+            contador++;
+            printf(" %d - %s - %s (R$ %.2f)\n",
+                   contador, trans.tipo, trans.descricao, trans.valor);
+        }
+    }
+    fclose(arq);
+
+    if (contador == 0) {
+        printf("\nNenhuma transação ativa encontrada.\n");
+        pausar();
+        return;
+    }
+
+    printf("\nDigite o número da transação: ");
+    scanf("%d", &numero);
+    limparBuffer();
+
+    if (numero < 1 || numero > contador) {
+        printf("\nNúmero inválido!\n");
+        pausar();
+        return;
+    }
+
+    arq = fopen(ARQUIVO_FINANCEIRO, "r+b");
+    contador = 0;
+    while (fread(&trans, sizeof(Transacao), 1, arq) == 1) {
+        if (trans.ativo == 1) {
+            contador++;
+            if (contador == numero) {
+                pos_arquivo = ftell(arq) - sizeof(Transacao);
+                break;
+            }
+        }
+    }
+
+    printf("\nTransação: %s - %s\n", trans.tipo, trans.descricao);
+    printf("Valor: R$ %.2f\n\n", trans.valor);
+    printf("Confirmar exclusão? (s/n): ");
+    scanf(" %c", &confirma);
+    limparBuffer();
+
+    if (confirma == 's' || confirma == 'S') {
+        trans.ativo = 0;
+        fseek(arq, pos_arquivo, SEEK_SET);
+        fwrite(&trans, sizeof(Transacao), 1, arq);
+        printf("\n Transação excluída com sucesso!\n");
+    } else {
+        printf("\nExclusão cancelada.\n");
+    }
+
+    fclose(arq);
+    pausar();
+}
