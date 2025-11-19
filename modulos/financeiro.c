@@ -49,3 +49,58 @@ void exibir_transacao(Transacao* trans) {
     printf("║ Data:        %s\n", trans->data);
     printf("╚══════════════════════════════════════════════════╝\n");
 }
+
+void gravar_transacao(Transacao* trans) {
+    FILE *arq = fopen(ARQUIVO_FINANCEIRO, "ab");
+    if (arq == NULL) {
+        return;
+    }
+
+    fwrite(trans, sizeof(Transacao), 1, arq);
+    fclose(arq);
+}
+
+void cadastrar_transacao() {
+    Transacao* trans = (Transacao*) malloc(sizeof(Transacao));
+
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║            REGISTRAR NOVA TRANSAÇÃO              ║\n");
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+
+    printf("► Descrição: ");
+    ler_string(trans->descricao, sizeof(trans->descricao));
+
+    printf("► Tipo (Receita/Despesa): ");
+    ler_string(trans->tipo, sizeof(trans->tipo));
+
+    printf("► Categoria: ");
+    ler_string(trans->categoria, sizeof(trans->categoria));
+
+    printf("► Valor (R$): ");
+    if (scanf("%f", &trans->valor) != 1) {
+        limparBuffer();
+        printf("Valor inválido.\n");
+        free(trans);
+        pausar();
+        return;
+    }
+    limparBuffer();
+
+    printf("► Data (DD/MM/AAAA): ");
+    ler_string(trans->data, sizeof(trans->data));
+
+    trans->ativo = 1;
+
+    if (!confirma_dados_transacao(trans)) {
+        printf("\nCadastro cancelado pelo usuário.\n");
+        free(trans);
+        pausar();
+        return;
+    }
+
+    gravar_transacao(trans);
+    printf("\n Transação registrada com sucesso!\n");
+    free(trans);
+    pausar();
+}
