@@ -62,8 +62,8 @@ ResultadoBuscacardapio selecionar_produto_cardapio() {
     while (fread(item, sizeof(Itemcardapio), 1, arq) == 1) {
         if (item->disponivel == 1) {
             contador++;
-            printf(" %d - %s (Qtd: %d, Validade: %s)\n",
-                   contador, item->nome, item->nome, item->categoria);
+            printf(" %d - %s ( Categoria: %s)\n",
+                   contador, item->nome, item->categoria);
         }
     }
     fclose(arq);
@@ -95,7 +95,7 @@ ResultadoBuscacardapio selecionar_produto_cardapio() {
             if (contador == numero) {
 
                 resultado.pos = ftell(arq) - sizeof(Itemcardapio);
-                resultado.item = *item;
+                resultado.item = item;
                 resultado.existe = 1;
 
                 fclose(arq);
@@ -184,86 +184,43 @@ void cadastrar_item_ao_cardapio() {
 
 
 void excluir_item_do_cardapio() {
-    FILE* arq_item;
-    Itemcardapio item;
-    int numero, contador = 0;
-    long pos_arquivo;
-    char confirma;
-
+    
     limpar_tela();
     printf("╔══════════════════════════════════════════════════╗\n");
     printf("║              EXCLUIR ITEM DO CARDÁPIO            ║\n");
     printf("╚══════════════════════════════════════════════════╝\n");
 
-    arq_item = fopen(ARQUIVO_ITEM, "rb");
-    if (arq_item == NULL) {
-        printf("Nenhum item cadastrado ainda.\n");
-        pausar();
-        return;
-    }
+    ResultadoBuscacardapio r = selecionar_produto_cardapio();
 
-    printf("Itens cadastrados:\n\n");
-    while (fread(&item, sizeof(Itemcardapio), 1, arq_item) == 1) {
-        if (item.disponivel == 1) {
-            contador++;
-            printf(" %d - %s  (R$ %.2f)\n", contador, item.nome, item.preco);
-        }
-    }
-    fclose(arq_item);
+    if (!r.existe) { pausar(); return; }
 
-    if (contador == 0) {
-        printf("\nNenhum item ativo encontrado.\n");
-        pausar();
-        return;
-    }
-
-    printf("\nDigite o número do item: ");
-    scanf("%d", &numero);
+    printf("\nConfirmar remoção de '%s'? (S/N): ", r.item->nome);
+    char resp;
+    scanf(" %c", &resp);
     limparBuffer();
 
-    if (numero < 1 || numero > contador) {
-        printf("\nNúmero inválido!\n");
+    if (resp != 'S' && resp != 's') {
+        printf("\nRemoção cancelada.\n");
+        free(r.item);
         pausar();
         return;
     }
 
-    arq_item = fopen(ARQUIVO_ITEM, "r+b");
-    contador = 0;
-    while (fread(&item, sizeof(Itemcardapio), 1, arq_item) == 1) {
-        if (item.disponivel == 1) {
-            contador++;
-            if (contador == numero) {
-                pos_arquivo = ftell(arq_item) - sizeof(Itemcardapio);
-                break;
-            }
-        }
-    }
+    FILE *arq = fopen(ARQUIVO_ITEM, "r+b");
+    fseek(arq, r.pos, SEEK_SET);
 
-    if (contador < numero) {
-        printf("\nItem não encontrado!\n");
-        fclose(arq_item);
-        pausar();
-        return;
-    }
-    limpar_tela();
-    exibir_item(&item);  // passa o endereço da struct
+    r.item->disponivel = 0;
 
-    printf("Confirmar exclusão? (s/n): ");
-    scanf(" %c", &confirma);  // espaço antes de %c
-    limparBuffer();
+    fwrite(r.item, sizeof(Itemcardapio), 1, arq);
 
-    if (confirma == 's' || confirma == 'S') {
-        item.disponivel = 0;
-        fseek(arq_item, pos_arquivo, SEEK_SET);
-        fwrite(&item, sizeof(Itemcardapio), 1, arq_item);
-        printf("\nItem excluído com sucesso!\n");
-    } else {
-        printf("\nExclusão cancelada!\n");
-    }
+    fclose(arq);
+    free(r.item);
 
-    fclose(arq_item);
+    printf("\nItem removido com sucesso!\n");
     pausar();
 }
+
+
 
 
 
