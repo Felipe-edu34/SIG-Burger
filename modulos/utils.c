@@ -1,11 +1,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef _WIN64 // Caso windows 64, use:
+    #include <windows.h>  //Trecho de código tirado do ChatGPT
+#else // Se não, Linux,Mcos, use:
+    #include <unistd.h>
+#endif
 
 
+int tempo_animacao = 100; // Tempo padrão para animação em milissegundos
 
 void limpar_tela() {
     system("clear||cls");
+}
+
+
+
+void func_Ani(int tempo){  //Função retirada do ChatGPT 4.0
+    #ifdef _WIN64
+        Sleep(tempo);
+    #else
+        usleep(tempo * 1000); 
+    #endif
 }
 
 
@@ -42,26 +58,48 @@ char* ler_string(char* destino, int tamanho) {
 
 void tela_inicial () {
     limpar_tela();
-    printf("\n");
+    func_Ani(tempo_animacao);
     printf("                                     @@@@........@@                               \n");
+    func_Ani(tempo_animacao);
     printf("                                @@-.---------------..:@@                          \n");
+    func_Ani(tempo_animacao);
     printf("                             @@.-------@-------@=------..=@                       \n");
+    func_Ani(tempo_animacao);
     printf("                           @@.---@------------------------.@@                     \n");
+    func_Ani(tempo_animacao);
     printf("                          @---------------------------@-----.@                    \n");
+    func_Ani(tempo_animacao);
     printf("                        @@---------------@-------------------.@@                  \n");
+    func_Ani(tempo_animacao);
     printf("                       @@---------@---------------@---------@--@@                 \n");
+    func_Ani(tempo_animacao);
     printf("                       @----------------------------------------@                 \n");
+    func_Ani(tempo_animacao);
     printf("                      @-----------@-----------------------------:@                \n");
+    func_Ani(tempo_animacao);
     printf("                     @@-----------------@----------------+-------@@               \n");
+    func_Ani(tempo_animacao);
     printf("                     @@--@------@------@------@----------@-------@@               \n");
+    func_Ani(tempo_animacao);
     printf("                     @@@@@@@@@@@@@@:@@::@@@@@@@@@@@@@@@@@@@@@@@@@@@               \n");
+    func_Ani(tempo_animacao);
     printf("                      +++++++++++BEM VINDO AO SIG-BURGER+++++++++++               \n");
+    func_Ani(tempo_animacao);
     printf("                       @@@@@@.@@@@...@@@@@@@@@@@@@@@@@@@@@@@@@@@@                 \n");
+    func_Ani(tempo_animacao);
     printf("                     @.------------------------------------------.@               \n");
+    func_Ani(tempo_animacao);
     printf("                     @--------------------------------------------@               \n");
+    func_Ani(tempo_animacao);
     printf("                      @==========================================@                \n");
+    func_Ani(tempo_animacao);
     printf("                         @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@                   \n");
+    func_Ani(tempo_animacao);
     printf("\n");
     
 }
+
+
+
+
 
