@@ -347,7 +347,6 @@ void cardapio() {
                 exibir_cardapio();
                 break;
             case 0:
-                printf("Voltando ao Menu Principal...\n");
                 break;
             default:
                 printf("Opção inválida! Tente novamente.\n");

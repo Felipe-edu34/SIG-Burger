@@ -389,7 +389,6 @@ void relatorio() {
                 } while (opcao_estoque != 0);
                 break;
             case 0:
-                printf("Voltando ao Menu Principal...\n");
                 break;
             default:
                 printf("Opção inválida! Tente novamente.\n");
