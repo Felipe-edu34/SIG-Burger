@@ -65,7 +65,7 @@ void sobre_o_sistema() {
 int main(void) {
     int opcao;
     tela_inicial();
-    sleep(3);
+    sleep(2);
 
     do {
         tela_menu_principal();
