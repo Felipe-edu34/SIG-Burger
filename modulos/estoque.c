@@ -180,6 +180,7 @@ void pesquisar_produto() {
     ResultadoBuscaEstoque r = selecionar_produto_estoque();
     if (!r.existe) { pausar(); return; }
 
+    limpar_tela();
     printf("\n► Detalhes do produto:\n");
     exibir_item_estoque(r.prod);
 
