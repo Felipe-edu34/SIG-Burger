@@ -107,10 +107,7 @@ void remover_produto() {
 
     ResultadoBuscaEstoque r = selecionar_produto_estoque();
 
-    if (!r.existe) {
-        pausar();
-        return;
-    }
+    if (!r.existe) { pausar(); return; }
 
     printf("\nConfirmar remoção de '%s'? (S/N): ", r.prod->nome);
     char resp;
@@ -257,7 +254,6 @@ ResultadoBuscaEstoque selecionar_produto_estoque() {
 
 
 
-
 void estoque() {
     int opcao;
 
@@ -280,8 +276,6 @@ void estoque() {
                 remover_produto();
                 break;
             case 0:
-                printf("\nVoltando ao Menu Principal...\n");
-                pausar();
                 break;
             default:
                 printf("\nOpção inválida! Tente novamente.\n");
