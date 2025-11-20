@@ -235,10 +235,10 @@ void editar_item_do_cardapio() {
     if (!r.existe) { pausar(); return; }
     limpar_tela();
     
-    ler_nome_produto(r.item->nome);
-    ler_categoria_item(r.item->categoria);
-    ler_descricao_item(r.item->descricao);
-    ler_preco_item(&r.item->preco);
+    ler_nome_item_cardapio(r.item->nome);
+    ler_categoria_cardapio(r.item->categoria);
+    ler_descricao_item_cardapio(r.item->descricao);
+    ler_preco(&r.item->preco);
     FILE *arq = fopen(ARQUIVO_ITEM, "r+b");
     fseek(arq, r.pos, SEEK_SET);
     fwrite(r.item, sizeof(Itemcardapio), 1, arq);
