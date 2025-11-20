@@ -150,23 +150,10 @@ void cadastrar_item_ao_cardapio() {
     printf("╚══════════════════════════════════════════════════╝\n");
 
     
-     printf("► Nome do Item: ");
-    ler_string(item->nome, sizeof(item->nome));
-
-    printf("► Categoria: ");
-    ler_string(item->categoria, sizeof(item->categoria));
-
-    printf("► Descrição: ");
-    ler_string(item->descricao, sizeof(item->descricao));
-
-    printf("► Preço (R$): ");
-    if (scanf("%f", &item->preco) != 1) {
-        limparBuffer();
-        printf("Preço inválido.\n");
-        pausar();
-        return;
-    }
-    limparBuffer();
+    ler_nome_item_cardapio(item->nome);
+    ler_categoria_cardapio(item->categoria);
+    ler_descricao_item_cardapio(item->descricao);
+    ler_preco(&item->preco);
 
     item->disponivel = 1;
 
