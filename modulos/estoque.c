@@ -273,7 +273,7 @@ void estoque() {
                 editar_produto();
                 break;
             case 3:
-                editar_produto();
+                pesquisar_produto();
                 break;
             case 4:
                 remover_produto();
