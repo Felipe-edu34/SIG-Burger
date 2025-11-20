@@ -141,79 +141,30 @@ void remover_produto() {
 
 
 void editar_produto() {
-    FILE *arq;
-    Produto *prod = (Produto*) malloc(sizeof(Produto));
-    int numero, contador = 0;
-    long pos_arquivo;
-
+    
     limpar_tela();
     printf("╔══════════════════════════════════════════════════╗\n");
     printf("║             EDITAR PRODUTO DO ESTOQUE            ║\n");
     printf("╚══════════════════════════════════════════════════╝\n\n");
+    
+    ResultadoBuscaEstoque r = selecionar_produto_estoque();
+    if (!r.existe) { pausar(); return; }
 
-    arq = fopen(ARQUIVO_ESTOQUE, "rb");
-    if (arq == NULL) {
-        printf("Nenhum produto cadastrado ainda.\n");
-        free(prod);
-        pausar();
-        return;
-    }
+    printf("\n► Editando produto: %s\n", r.prod->nome);
 
-    printf("Produtos cadastrados:\n\n");
-    while (fread(prod, sizeof(Produto), 1, arq) == 1) {
-        if (prod->ativo == 1) {
-            contador++;
-            printf(" %d - %s  (Qtd: %d, Validade: %s)\n",
-                   contador, prod->nome, prod->quantidade, prod->validade);
-        }
-    }
+    ler_nome_produto(r.prod->nome);
+    ler_categoria_estoque(r.prod->categoria);
+    ler_quantidade(&r.prod->quantidade);
+    ler_validade(r.prod->validade);
+
+    FILE *arq = fopen(ARQUIVO_ESTOQUE, "r+b");
+    fseek(arq, r.pos, SEEK_SET);
+    fwrite(r.prod, sizeof(Produto), 1, arq);
     fclose(arq);
 
-    if (contador == 0) {
-        printf("\nNenhum produto ativo encontrado.\n");
-        free(prod);
-        pausar();
-        return;
-    }
+    free(r.prod);
 
-    printf("\nDigite o número do produto que deseja editar: ");
-    scanf("%d", &numero);
-    limparBuffer();
-
-    if (numero < 1 || numero > contador) {
-        printf("\nNúmero inválido!\n");
-        free(prod);
-        pausar();
-        return;
-    }
-
-    arq = fopen(ARQUIVO_ESTOQUE, "r+b");
-    contador = 0;
-    while (fread(prod, sizeof(Produto), 1, arq) == 1) {
-        if (prod->ativo == 1) {
-            contador++;
-            if (contador == numero) {
-                pos_arquivo = ftell(arq) - sizeof(Produto);
-                break;
-            }
-        }
-    }
-
-    printf("\n► Editando produto: %s\n", prod->nome);
-    printf("----------------------------------------------------\n");
-
-    ler_nome_produto(prod->nome);
-    ler_categoria_estoque(prod->categoria);
-    ler_quantidade(&prod->quantidade);
-    ler_validade(prod->validade);
-
-    fseek(arq, pos_arquivo, SEEK_SET);
-    fwrite(prod, sizeof(Produto), 1, arq);
-
-    fclose(arq);
-    free(prod);
-
-    printf("\n Produto atualizado com sucesso!\n");
+    printf("\nProduto atualizado!\n");
     pausar();
 }
 
