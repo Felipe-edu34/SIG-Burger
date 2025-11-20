@@ -171,84 +171,21 @@ void editar_produto() {
 
 
 void pesquisar_produto() {
-    FILE *arq;
-    Produto *prod = (Produto*) malloc(sizeof(Produto));
-    int numero, contador = 0, encontrado = 0;
 
     limpar_tela();
     printf("╔══════════════════════════════════════════════════╗\n");
     printf("║                 PESQUISAR PRODUTO                ║\n");
     printf("╚══════════════════════════════════════════════════╝\n\n");
 
-    arq = fopen(ARQUIVO_ESTOQUE, "rb");
-    if (arq == NULL) {
-        printf("Nenhum produto cadastrado ainda.\n");
-        free(prod);
-        pausar();
-        return;
-    }
+    ResultadoBuscaEstoque r = selecionar_produto_estoque();
+    if (!r.existe) { pausar(); return; }
 
-    printf("Produtos disponíveis:\n\n");
-    while (fread(prod, sizeof(Produto), 1, arq) == 1) {
-        if (prod->ativo == 1) {
-            contador++;
-            printf(" %d - %s  (Qtd: %d)\n", contador, prod->nome, prod->quantidade);
-        }
-    }
-    fclose(arq);
+    printf("\n► Detalhes do produto:\n");
+    exibir_item_estoque(r.prod);
 
-    if (contador == 0) {
-        printf("\nNenhum produto ativo encontrado.\n");
-        free(prod);
-        pausar();
-        return;
-    }
-
-    printf("\nDigite o número do produto para ver detalhes: ");
-    scanf("%d", &numero);
-    limparBuffer();
-
-    if (numero < 1 || numero > contador) {
-        printf("\nNúmero inválido!\n");
-        free(prod);
-        pausar();
-        return;
-    }
-
-    arq = fopen(ARQUIVO_ESTOQUE, "rb");
-    contador = 0;
-    while (fread(prod, sizeof(Produto), 1, arq) == 1) {
-        if (prod->ativo == 1) {
-            contador++;
-            if (contador == numero) {
-                encontrado = 1; // marca que achou o item
-            }
-        }
-
-        if (encontrado) {
-            limpar_tela();
-            printf("╔══════════════════════════════════════════════════╗\n");
-            printf("║               DETALHES DO PRODUTO                ║\n");
-            printf("╚══════════════════════════════════════════════════╝\n\n");
-
-            printf("► Nome: %s\n", prod->nome);
-            printf("► Categoria: %s\n", prod->categoria);
-            printf("► Quantidade: %d\n", prod->quantidade);
-            printf("► Validade: %s\n", prod->validade);
-            printf("► Status: %s\n", prod->ativo ? "Ativo" : "Inativo");
-
-            printf("\n╚══════════════════════════════════════════════════╝\n");
-            encontrado = 2; // muda o estado para indicar que já mostrou
-        }
-    }
-
-    if (encontrado == 0) {
-        printf("\nProduto não encontrado.\n");
-    }
-
-    fclose(arq);
-    free(prod);
+    free(r.prod);
     pausar();
+    
 }
 
 
