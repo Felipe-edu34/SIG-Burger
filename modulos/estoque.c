@@ -99,247 +99,162 @@ void cadastrar_produto(){
 
 
 void remover_produto() {
-    FILE *arq;
-    Produto *prod = (Produto*) malloc(sizeof(Produto));
-    int numero, contador = 0;
-    long pos_arquivo;
 
     limpar_tela();
     printf("╔══════════════════════════════════════════════════╗\n");
     printf("║              REMOVER PRODUTO DO ESTOQUE          ║\n");
     printf("╚══════════════════════════════════════════════════╝\n\n");
 
-    arq = fopen(ARQUIVO_ESTOQUE, "rb");
-    if (arq == NULL) {
-        printf("Nenhum produto cadastrado ainda.\n");
-        free(prod);
+    ResultadoBuscaEstoque r = selecionar_produto_estoque();
+
+    if (!r.existe) {
         pausar();
         return;
     }
 
-    // Exibir produtos ativos
-    printf("Produtos disponíveis:\n\n");
-    while (fread(prod, sizeof(Produto), 1, arq) == 1) {
-        if (prod->ativo == 1) {
-            contador++;
-            printf(" %d - %s  (Qtd: %d, Validade: %s)\n",
-                   contador, prod->nome, prod->quantidade, prod->validade);
-        }
-    }
-    fclose(arq);
-
-    if (contador == 0) {
-        printf("\nNenhum produto ativo encontrado.\n");
-        free(prod);
-        pausar();
-        return;
-    }
-
-    printf("\nDigite o número do produto que deseja remover: ");
-    scanf("%d", &numero);
-    limparBuffer();
-
-    if (numero < 1 || numero > contador) {
-        printf("\nNúmero inválido!\n");
-        free(prod);
-        pausar();
-        return;
-    }
-
-    // Reabrir arquivo para edição
-    arq = fopen(ARQUIVO_ESTOQUE, "r+b");
-    contador = 0;
-
-    while (fread(prod, sizeof(Produto), 1, arq) == 1) {
-        if (prod->ativo == 1) {
-            contador++;
-            if (contador == numero) {
-                pos_arquivo = ftell(arq) - sizeof(Produto);
-                break;
-            }
-        }
-    }
-
-    printf("\nConfirmar remoção do produto '%s'? (S/N): ", prod->nome);
+    printf("\nConfirmar remoção de '%s'? (S/N): ", r.prod->nome);
     char resp;
     scanf(" %c", &resp);
     limparBuffer();
 
-    if (resp == 'S' || resp == 's') {
-        prod->ativo = 0;
-        fseek(arq, pos_arquivo, SEEK_SET);
-        fwrite(prod, sizeof(Produto), 1, arq);
-        printf("\n Produto removido com sucesso!\n");
-    } else {
+    if (resp != 'S' && resp != 's') {
         printf("\nRemoção cancelada.\n");
+        free(r.prod);
+        pausar();
+        return;
     }
 
+    FILE *arq = fopen(ARQUIVO_ESTOQUE, "r+b");
+    fseek(arq, r.pos, SEEK_SET);
+
+    r.prod->ativo = 0;
+
+    fwrite(r.prod, sizeof(Produto), 1, arq);
+
     fclose(arq);
-    free(prod);
+    free(r.prod);
+
+    printf("\nProduto removido com sucesso!\n");
     pausar();
 }
 
 
 
 void editar_produto() {
-    FILE *arq;
-    Produto *prod = (Produto*) malloc(sizeof(Produto));
-    int numero, contador = 0;
-    long pos_arquivo;
-
+    
     limpar_tela();
     printf("╔══════════════════════════════════════════════════╗\n");
     printf("║             EDITAR PRODUTO DO ESTOQUE            ║\n");
     printf("╚══════════════════════════════════════════════════╝\n\n");
+    
+    ResultadoBuscaEstoque r = selecionar_produto_estoque();
+    if (!r.existe) { pausar(); return; }
 
-    arq = fopen(ARQUIVO_ESTOQUE, "rb");
-    if (arq == NULL) {
-        printf("Nenhum produto cadastrado ainda.\n");
-        free(prod);
-        pausar();
-        return;
-    }
+    printf("\n► Editando produto: %s\n", r.prod->nome);
 
-    printf("Produtos cadastrados:\n\n");
-    while (fread(prod, sizeof(Produto), 1, arq) == 1) {
-        if (prod->ativo == 1) {
-            contador++;
-            printf(" %d - %s  (Qtd: %d, Validade: %s)\n",
-                   contador, prod->nome, prod->quantidade, prod->validade);
-        }
-    }
+    ler_nome_produto(r.prod->nome);
+    ler_categoria_estoque(r.prod->categoria);
+    ler_quantidade(&r.prod->quantidade);
+    ler_validade(r.prod->validade);
+
+    FILE *arq = fopen(ARQUIVO_ESTOQUE, "r+b");
+    fseek(arq, r.pos, SEEK_SET);
+    fwrite(r.prod, sizeof(Produto), 1, arq);
     fclose(arq);
 
-    if (contador == 0) {
-        printf("\nNenhum produto ativo encontrado.\n");
-        free(prod);
-        pausar();
-        return;
-    }
+    free(r.prod);
 
-    printf("\nDigite o número do produto que deseja editar: ");
-    scanf("%d", &numero);
-    limparBuffer();
-
-    if (numero < 1 || numero > contador) {
-        printf("\nNúmero inválido!\n");
-        free(prod);
-        pausar();
-        return;
-    }
-
-    arq = fopen(ARQUIVO_ESTOQUE, "r+b");
-    contador = 0;
-    while (fread(prod, sizeof(Produto), 1, arq) == 1) {
-        if (prod->ativo == 1) {
-            contador++;
-            if (contador == numero) {
-                pos_arquivo = ftell(arq) - sizeof(Produto);
-                break;
-            }
-        }
-    }
-
-    printf("\n► Editando produto: %s\n", prod->nome);
-    printf("----------------------------------------------------\n");
-
-    ler_nome_produto(prod->nome);
-    ler_categoria_estoque(prod->categoria);
-    ler_quantidade(&prod->quantidade);
-    ler_validade(prod->validade);
-
-    fseek(arq, pos_arquivo, SEEK_SET);
-    fwrite(prod, sizeof(Produto), 1, arq);
-
-    fclose(arq);
-    free(prod);
-
-    printf("\n Produto atualizado com sucesso!\n");
+    printf("\nProduto atualizado!\n");
     pausar();
 }
 
 
 
 void pesquisar_produto() {
-    FILE *arq;
-    Produto *prod = (Produto*) malloc(sizeof(Produto));
-    int numero, contador = 0, encontrado = 0;
 
     limpar_tela();
     printf("╔══════════════════════════════════════════════════╗\n");
     printf("║                 PESQUISAR PRODUTO                ║\n");
     printf("╚══════════════════════════════════════════════════╝\n\n");
 
+    ResultadoBuscaEstoque r = selecionar_produto_estoque();
+    if (!r.existe) { pausar(); return; }
+
+    limpar_tela();
+    printf("\n► Detalhes do produto:\n");
+    exibir_item_estoque(r.prod);
+
+    free(r.prod);
+    pausar();
+    
+}
+
+
+
+ResultadoBuscaEstoque selecionar_produto_estoque() {
+    FILE *arq;
+    Produto *prod = (Produto*) malloc(sizeof(Produto));
+    int contador = 0, numero;
+    ResultadoBuscaEstoque resultado = {0, NULL, 0};
+
     arq = fopen(ARQUIVO_ESTOQUE, "rb");
     if (arq == NULL) {
-        printf("Nenhum produto cadastrado ainda.\n");
+        printf("Nenhum produto cadastrado.\n");
         free(prod);
-        pausar();
-        return;
+        return resultado;
     }
 
     printf("Produtos disponíveis:\n\n");
     while (fread(prod, sizeof(Produto), 1, arq) == 1) {
         if (prod->ativo == 1) {
             contador++;
-            printf(" %d - %s  (Qtd: %d)\n", contador, prod->nome, prod->quantidade);
+            printf(" %d - %s (Qtd: %d, Validade: %s)\n",
+                   contador, prod->nome, prod->quantidade, prod->validade);
         }
     }
     fclose(arq);
 
     if (contador == 0) {
-        printf("\nNenhum produto ativo encontrado.\n");
+        printf("\nNenhum produto ativo.\n");
         free(prod);
-        pausar();
-        return;
+        return resultado;
     }
 
-    printf("\nDigite o número do produto para ver detalhes: ");
+    printf("\nEscolha o produto: ");
     scanf("%d", &numero);
     limparBuffer();
 
     if (numero < 1 || numero > contador) {
         printf("\nNúmero inválido!\n");
         free(prod);
-        pausar();
-        return;
+        return resultado;
     }
 
+    // Reabrir arquivo para obter a posição real
     arq = fopen(ARQUIVO_ESTOQUE, "rb");
     contador = 0;
+
     while (fread(prod, sizeof(Produto), 1, arq) == 1) {
+
         if (prod->ativo == 1) {
             contador++;
             if (contador == numero) {
-                encontrado = 1; // marca que achou o item
+
+                resultado.pos = ftell(arq) - sizeof(Produto);
+                resultado.prod = prod;
+                resultado.existe = 1;
+
+                fclose(arq);
+                return resultado;
             }
         }
-
-        if (encontrado) {
-            limpar_tela();
-            printf("╔══════════════════════════════════════════════════╗\n");
-            printf("║               DETALHES DO PRODUTO                ║\n");
-            printf("╚══════════════════════════════════════════════════╝\n\n");
-
-            printf("► Nome: %s\n", prod->nome);
-            printf("► Categoria: %s\n", prod->categoria);
-            printf("► Quantidade: %d\n", prod->quantidade);
-            printf("► Validade: %s\n", prod->validade);
-            printf("► Status: %s\n", prod->ativo ? "Ativo" : "Inativo");
-
-            printf("\n╚══════════════════════════════════════════════════╝\n");
-            encontrado = 2; // muda o estado para indicar que já mostrou
-        }
-    }
-
-    if (encontrado == 0) {
-        printf("\nProduto não encontrado.\n");
     }
 
     fclose(arq);
     free(prod);
-    pausar();
+    return resultado;
 }
+
 
 
 
@@ -359,7 +274,7 @@ void estoque() {
                 editar_produto();
                 break;
             case 3:
-                editar_produto();
+                pesquisar_produto();
                 break;
             case 4:
                 remover_produto();

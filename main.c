@@ -32,12 +32,42 @@ void tela_menu_principal() {
 
 
 
+void sobre_o_sistema() {
+
+    limpar_tela();
+    printf("\n╔══════════════════════════════════════════════════╗\n");
+    printf("║                    SOBRE O SIG-BURGER             ║\n");
+    printf("╠═══════════════════════════════════════════════════╣\n");
+    printf("║                                                   ║\n");
+    printf("║   O SIG-Burger é um sistema desenvolvido para     ║\n");
+    printf("║   facilitar o gerenciamento de pedidos, itens     ║\n");
+    printf("║   de cardápio e operações internas de uma         ║\n");
+    printf("║   hamburgueria. Criado com foco em eficiência,    ║\n");
+    printf("║   simplicidade e organização, o projeto faz parte ║\n");
+    printf("║   das atividades acadêmicas dos desenvolvedores.  ║\n");
+    printf("║                                                   ║\n");
+    printf("║   Desenvolvedores:                                ║\n");
+    printf("║      • Felipe Eduardo                             ║\n");
+    printf("║      • Elisson Tavares                            ║\n");
+    printf("║                                                   ║\n");
+    printf("║   Contato:                                        ║\n");
+    printf("║      • felipe.fernandes.710@ufrn.edu.br           ║\n");
+    printf("║      • elisson.tavares.dev@gmail.com              ║\n");
+    printf("║                                                   ║\n");
+    printf("╚═══════════════════════════════════════════════════╝\n");
+    pausar();
+}
+
+
+
 int main(void) {
     int opcao;
 
     do {
         tela_menu_principal();
         scanf("%d", &opcao);
+        limparBuffer();
+
 
         switch (opcao) {
             case 1:
@@ -60,9 +90,9 @@ int main(void) {
                 relatorio();
                 break;
             case 7:
-                printf("Sobre o SIG-Burger selecionado.\n");
-                // Chamar função sobre o SIG-Burger
+                sobre_o_sistema();
                 break;
+
             case 0:
                 printf("Saindo do sistema...\n");
                 break;
