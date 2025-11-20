@@ -99,9 +99,6 @@ void cadastrar_produto(){
 
 
 void remover_produto() {
-    Produto *prod = (Produto*) malloc(sizeof(Produto));
-    
-    
 
     limpar_tela();
     printf("╔══════════════════════════════════════════════════╗\n");
