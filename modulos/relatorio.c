@@ -108,7 +108,7 @@ void relatorio_cardapio_itens_disponiveis() {
         limparBuffer();
         return;
     }
-    while (fread(item, sizeof(Cliente), 1, arq_cardapio) == 1) {
+    while (fread(item, sizeof(Itemcardapio), 1, arq_cardapio) == 1) {
         if(item->disponivel == 1){
         exibir_item(item);
         }
@@ -133,7 +133,7 @@ void relatorio_cardapio_itens_indisponiveis() {
         limparBuffer();
         return;
     }
-    while (fread(item, sizeof(Cliente), 1, arq_cardapio) == 1) {
+    while (fread(item, sizeof(Itemcardapio), 1, arq_cardapio) == 1) {
         if(item->disponivel == 1){
         exibir_item(item);
         }
