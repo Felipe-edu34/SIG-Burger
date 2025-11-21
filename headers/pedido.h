@@ -19,6 +19,8 @@ typedef struct {
     ItemPedido itens[MAX_ITENS_PEDIDO];
     int total_itens;
     float valor_total;
+    float taxa_entrega;
+    int eh_delivery;
     char status[20];
     char data[11];
     int ativo;
