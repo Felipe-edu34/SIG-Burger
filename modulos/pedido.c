@@ -499,3 +499,40 @@ void excluir_pedido() {
     fclose(arq);
     pausar();
 }
+
+void pedido() {
+    int opcao;
+
+    do {
+        menu_pedidos();
+        scanf("%d", &opcao);
+        limparBuffer();
+
+        switch (opcao) {
+            case 1:
+                cadastrar_pedido();
+                break;
+            case 2:
+                listar_pedidos();
+                break;
+            case 3:
+                editar_pedido();
+                break;
+            case 4:
+                pesquisar_pedido();
+                break;
+            case 5:
+                excluir_pedido();
+                break;
+            case 0:
+                printf("\nVoltando ao Menu Principal...\n");
+                pausar();
+                break;
+            default:
+                printf("\nOpção inválida! Tente novamente.\n");
+                pausar();
+                break;
+        }
+
+    } while (opcao != 0);
+}
