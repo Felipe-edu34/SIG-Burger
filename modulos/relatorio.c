@@ -180,9 +180,11 @@ void procurar_item_por_categoria() {
 
 
 void exibindo_item_do_cardapio_por_preco() {
+
     FILE *fp;
     Itemcardapio *lista = NULL;
     Itemcardapio *novo, *atual, *anter;
+    Itemcardapio temp;
 
     fp = fopen(ARQUIVO_ITEM, "rb");
     if (fp == NULL) {
@@ -191,50 +193,87 @@ void exibindo_item_do_cardapio_por_preco() {
         return;
     }
 
-    // Montando a lista ordenada por preço
-    while (1) {
+    // ======= LENDO ITENS DO ARQUIVO E CRIANDO LISTA ORDENADA POR PREÇO (STRING) =======
+    while (fread(&temp, sizeof(Itemcardapio), 1, fp) == 1) {
+
+        // Só lista os itens disponíveis
+        if (temp.disponivel != 1)
+            continue;
+
+        // Aloca nó novo
         novo = (Itemcardapio*) malloc(sizeof(Itemcardapio));
-        if (fread(novo, sizeof(Itemcardapio), 1, fp) != 1) {
-            free(novo);
-            break;
+        if (!novo) {
+            printf("Erro ao alocar memória!\n");
+            fclose(fp);
+            return;
         }
+
+        memcpy(novo, &temp, sizeof(Itemcardapio));
         novo->prox = NULL;
 
-        // Inserção ordenada por preço
-        if (lista == NULL || novo->preco < lista->preco) {
-            novo->prox = lista;
+        // Criar strings de preço
+        char preco_novo[20];
+        sprintf(preco_novo, "%.2f", novo->preco);
+
+        // Inserção no início se lista vazia ou preço menor
+        if (lista == NULL) {
             lista = novo;
-        } 
+        }
         else {
-            anter = lista;
-            atual = lista->prox;
 
-            while (atual != NULL && atual->preco < novo->preco) {
-                anter = atual;
-                atual = atual->prox;
+            char preco_lista[20];
+            sprintf(preco_lista, "%.2f", lista->preco);
+
+            if (strcmp(preco_novo, preco_lista) < 0) {
+                novo->prox = lista;
+                lista = novo;
             }
+            else {
+                anter = lista;
+                atual  = lista->prox;
 
-            anter->prox = novo;
-            novo->prox = atual;
+                while (atual != NULL) {
+
+                    char preco_atual[20];
+                    sprintf(preco_atual, "%.2f", atual->preco);
+
+                    if (strcmp(preco_novo, preco_atual) < 0)
+                        break;
+
+                    anter = atual;
+                    atual = atual->prox;
+                }
+
+                anter->prox = novo;
+                novo->prox  = atual;
+            }
         }
     }
 
     fclose(fp);
 
+    // ======= EXIBIÇÃO =======
     limpar_tela();
     printf("╔══════════════════════════════════════════════════╗\n");
     printf("║            ITENS DO CARDÁPIO POR PREÇO           ║\n");
     printf("╠══════════════════════════════════════════════════╣\n");
 
-    // Exibindo
     int i = 1;
     atual = lista;
+
+    if (atual == NULL) {
+        printf("║      Nenhum item disponível no cardápio          ║\n");
+        printf("╚══════════════════════════════════════════════════╝\n");
+        pausar();
+        return;
+    }
+
     while (atual != NULL) {
 
-        printf("║  %d) %s\n", i, atual->nome);
+        printf("║  %d %s\n", i, atual->nome);
         printf("║     Categoria : %s\n", atual->categoria);
         printf("║     Preço     : R$ %.2f\n", atual->preco);
-        printf("║     Status    : %s\n", atual->disponivel ? "Disponível" : "Indisponível");
+        printf("║     Status    : Disponível\n");
         printf("║--------------------------------------------------║\n");
 
         atual = atual->prox;
@@ -244,13 +283,17 @@ void exibindo_item_do_cardapio_por_preco() {
     printf("╚══════════════════════════════════════════════════╝\n");
     pausar();
 
-    // Liberando memória
+    // ======= LIBERANDO MEMÓRIA =======
     while (lista != NULL) {
         atual = lista;
         lista = lista->prox;
         free(atual);
     }
 }
+
+
+    
+
 
 
 
@@ -432,6 +475,9 @@ void relatorio() {
                             break;
                         case 4:
                             procurar_item_por_categoria();
+                            break;
+                        case 5:
+                            exibindo_item_do_cardapio_por_preco();
                             break;
                         case 0:
                             printf("Voltando ao Menu de Relatórios...\n");
