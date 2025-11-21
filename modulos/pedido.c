@@ -238,3 +238,48 @@ void cadastrar_pedido() {
     free(ped);
     pausar();
 }
+
+void listar_pedidos() {
+    FILE *arq;
+    Pedido ped;
+    int contador = 0;
+
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║                LISTA DE PEDIDOS                  ║\n");
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+
+    arq = fopen(ARQUIVO_PEDIDOS, "rb");
+    if (arq == NULL) {
+        printf("Nenhum pedido cadastrado ainda.\n");
+        pausar();
+        return;
+    }
+
+    printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+
+    while (fread(&ped, sizeof(Pedido), 1, arq) == 1) {
+        if (ped.ativo == 1) {
+            contador++;
+            printf("Pedido #%d\n", ped.numero_pedido);
+            printf("Cliente: %s\n", ped.nome_cliente);
+            printf("Telefone: %s\n", ped.telefone_cliente);
+            printf("Tipo: %s\n", ped.eh_delivery ? "DELIVERY" : "CONSUMO NO LOCAL");
+            printf("Data: %s\n", ped.data);
+            printf("Status: %s\n", ped.status);
+            printf("Total de Itens: %d\n", ped.total_itens);
+            printf("Valor: R$ %.2f\n", ped.valor_total);
+            printf("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+        }
+    }
+
+    fclose(arq);
+
+    if (contador == 0) {
+        printf("Nenhum pedido ativo encontrado.\n");
+    } else {
+        printf("Total de pedidos: %d\n", contador);
+    }
+
+    pausar();
+}
