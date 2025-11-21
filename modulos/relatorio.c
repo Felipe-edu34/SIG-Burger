@@ -31,66 +31,108 @@ void menu_relatorio(){
 
 
 
-void exibir_cardapio_relatorio() {
 
-
+void exibindo_cardapio_por_categoria() {
     FILE *arq_item;
-    Itemcardapio item;
-    char categoria_atual[50] = "";
-    int encontrou = 0;
+    Itemcardapio temp;
 
-    limpar_tela();
-    printf("╔════════════════════════════════════════════════════════════════════════════════════════════╗\n");
-    printf("║                                         CARDÁPIO                                           ║\n");
-    printf("╠════════════════════════════════════════════════════════════════════════════════════════════╣\n");
+    NodeItem *lista = NULL;
+    NodeItem *novo, *atual, *anter;
 
     arq_item = fopen(ARQUIVO_ITEM, "rb");
     if (arq_item == NULL) {
-        printf("║ Nenhum item cadastrado ainda.                                                              ║\n");
+        limpar_tela();
+        printf("╔════════════════════════════════════════════════════════════════════════════════════════════╗\n");
+        printf("║ Nenhum item cadastrado ainda.                                                             ║\n");
         printf("╚════════════════════════════════════════════════════════════════════════════════════════════╝\n");
         pausar();
         return;
     }
 
-    // Ler arquivo uma vez, em ordem
-    while (fread(&item, sizeof(Itemcardapio), 1, arq_item) == 1) {
-        if (item.disponivel == 0)
+    // 1 — LER ARQUIVO E INSERIR ORDENADO POR CATEGORIA
+    while (fread(&temp, sizeof(Itemcardapio), 1, arq_item) == 1) {
+
+        if (temp.disponivel == 0)
             continue;
 
-        // Quando muda a categoria, imprime título
-        if (strcmp(categoria_atual, item.categoria) != 0) {
+        novo = malloc(sizeof(NodeItem));
+        novo->dado = temp;
+        novo->prox = NULL;
+
+        // insere ordenado por categoria
+        if (lista == NULL || strcmp(novo->dado.categoria, lista->dado.categoria) < 0) {
+            novo->prox = lista;
+            lista = novo;
+        } else {
+            anter = lista;
+            atual = lista->prox;
+
+            while (atual != NULL &&
+                   strcmp(novo->dado.categoria, atual->dado.categoria) > 0) {
+                anter = atual;
+                atual = atual->prox;
+            }
+
+            anter->prox = novo;
+            novo->prox = atual;
+        }
+    }
+    fclose(arq_item);
+
+    // 2 — EXIBIR IGUAL AO SEU MODELO
+    limpar_tela();
+    printf("╔════════════════════════════════════════════════════════════════════════════════════════════╗\n");
+    printf("║                                         CARDÁPIO                                           ║\n");
+    printf("╠════════════════════════════════════════════════════════════════════════════════════════════╣\n");
+
+    char categoria_atual[30] = "";
+    int encontrou = 0;
+
+    atual = lista;
+    while (atual != NULL) {
+
+        // mudou categoria
+        if (strcmp(categoria_atual, atual->dado.categoria) != 0) {
             if (encontrou)
                 printf("╠════════════════════════════════════════════════════════════════════════════════════════════╣\n");
 
-            strcpy(categoria_atual, item.categoria);
+            strcpy(categoria_atual, atual->dado.categoria);
             printf("║   %-89s║\n", categoria_atual);
             printf("║ ------------------------------------------------------------------------------------------ ║\n");
         }
 
         encontrou = 1;
 
-        // Exibe item formatado
-        char linha[70];
-        snprintf(linha, sizeof(linha), "• %-28s R$ %6.2f", item.nome, item.preco);
+        char linha[100];
+        snprintf(linha, sizeof(linha), "• %-28s R$ %6.2f", atual->dado.nome, atual->dado.preco);
         printf("║ %-93s║\n", linha);
 
-        if (strlen(item.descricao) > 0) {
-            char desc[110];
-            snprintf(desc, sizeof(desc), "↳ %s", item.descricao);
+        if (strlen(atual->dado.descricao) > 0) {
+            char desc[140];
+            snprintf(desc, sizeof(desc), "↳ %s", atual->dado.descricao);
             printf("║    %-90s║\n", desc);
         }
 
         printf("║                                                                                            ║\n");
+
+        atual = atual->prox;
     }
 
     if (!encontrou) {
-        printf("║ Nenhum item ativo encontrado.                           ║\n");
+        printf("║ Nenhum item ativo encontrado.                                                             ║\n");
     }
 
     printf("╚════════════════════════════════════════════════════════════════════════════════════════════╝\n");
-    fclose(arq_item);
     pausar();
+
+    // 3 — LIBERA MEMÓRIA
+    while (lista != NULL) {
+        atual = lista;
+        lista = lista->prox;
+        free(atual);
+    }
 }
+
 
 
 
@@ -422,7 +464,7 @@ void relatorio() {
 
                     switch (opcao_cardapio) {
                         case 1:
-                            exibir_cardapio_relatorio();
+                            exibindo_cardapio_por_categoria();
                             break;
                         case 2:
                             relatorio_cardapio_itens_disponiveis();
