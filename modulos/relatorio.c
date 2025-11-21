@@ -179,6 +179,84 @@ void procurar_item_por_categoria() {
 
 
 
+void exibindo_item_do_cardapio_por_preco() {
+    FILE *fp;
+    Itemcardapio *lista = NULL;
+    Itemcardapio *novo, *atual, *anter;
+
+    fp = fopen(ARQUIVO_ITEM, "rb");
+    if (fp == NULL) {
+        printf("Erro ao abrir o arquivo do cardápio!\n");
+        pausar();
+        return;
+    }
+
+    // Montando a lista ordenada por preço
+    while (1) {
+        novo = (Itemcardapio*) malloc(sizeof(Itemcardapio));
+        if (fread(novo, sizeof(Itemcardapio), 1, fp) != 1) {
+            free(novo);
+            break;
+        }
+        novo->prox = NULL;
+
+        // Inserção ordenada por preço
+        if (lista == NULL || novo->preco < lista->preco) {
+            novo->prox = lista;
+            lista = novo;
+        } 
+        else {
+            anter = lista;
+            atual = lista->prox;
+
+            while (atual != NULL && atual->preco < novo->preco) {
+                anter = atual;
+                atual = atual->prox;
+            }
+
+            anter->prox = novo;
+            novo->prox = atual;
+        }
+    }
+
+    fclose(fp);
+
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║            ITENS DO CARDÁPIO POR PREÇO           ║\n");
+    printf("╠══════════════════════════════════════════════════╣\n");
+
+    // Exibindo
+    int i = 1;
+    atual = lista;
+    while (atual != NULL) {
+
+        printf("║  %d) %s\n", i, atual->nome);
+        printf("║     Categoria : %s\n", atual->categoria);
+        printf("║     Preço     : R$ %.2f\n", atual->preco);
+        printf("║     Status    : %s\n", atual->disponivel ? "Disponível" : "Indisponível");
+        printf("║--------------------------------------------------║\n");
+
+        atual = atual->prox;
+        i++;
+    }
+
+    printf("╚══════════════════════════════════════════════════╝\n");
+    pausar();
+
+    // Liberando memória
+    while (lista != NULL) {
+        atual = lista;
+        lista = lista->prox;
+        free(atual);
+    }
+}
+
+
+
+
+
+
 void relatorio_cardapio() {
     limpar_tela();
     printf("╔══════════════════════════════════════════════════╗\n");
@@ -392,7 +470,7 @@ void relatorio() {
                 break;
             case 0:
                 break;
-                
+
             default:
                 printf("Opção inválida! Tente novamente.\n");
         }
