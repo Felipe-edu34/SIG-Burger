@@ -10,14 +10,21 @@ struct Itemcardapio {
     char descricao[100];
     float preco;
     int disponivel;
-    Itemcardapio* prox; 
 };
+
+
 
 typedef struct {
     long pos;        // posição no arquivo
     Itemcardapio *item;   // ponteiro para o produto encontrado
     int existe;      // 1 = encontrado, 0 = não
 } ResultadoBuscacardapio;
+
+
+typedef struct NodeItem {
+    Itemcardapio dado;
+    struct NodeItem* prox;
+} NodeItem;
 
 void tela_menu_principal();
 void cardapio();
