@@ -43,3 +43,61 @@ int gerar_numero_pedido() {
 
     return maior_numero + 1;
 }
+
+int confirma_dados_pedido(Pedido* ped) {
+    char confirm;
+    limpar_tela();
+    exibir_pedido(ped);
+    printf("\nOs dados do pedido estão corretos? (S/N): ");
+    scanf(" %c", &confirm);
+    limparBuffer();
+
+    if (confirm == 'S' || confirm == 's') {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+void exibir_pedido(Pedido* ped) {
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║              DETALHES DO PEDIDO                  ║\n");
+    printf("╠══════════════════════════════════════════════════╣\n");
+    printf("║ Número:      #%d\n", ped->numero_pedido);
+    printf("║ Cliente:     %s\n", ped->nome_cliente);
+    printf("║ Telefone:    %s\n", ped->telefone_cliente);
+    
+    if (ped->eh_delivery) {
+        printf("║ Tipo:        DELIVERY\n");
+        printf("║ Endereço:    %s\n", ped->endereco_entrega);
+    } else {
+        printf("║ Tipo:        CONSUMO NO LOCAL\n");
+    }
+    
+    printf("║ Data:        %s\n", ped->data);
+    printf("║ Status:      %s\n", ped->status);
+    printf("╠══════════════════════════════════════════════════╣\n");
+    printf("║ ITENS DO PEDIDO:\n");
+    printf("║\n");
+    
+    for (int i = 0; i < ped->total_itens; i++) {
+        printf("║ • %dx %s\n", 
+               ped->itens[i].quantidade, 
+               ped->itens[i].item.nome);
+        printf("║   R$ %.2f x %d = R$ %.2f\n", 
+               ped->itens[i].item.preco,
+               ped->itens[i].quantidade,
+               ped->itens[i].item.preco * ped->itens[i].quantidade);
+        printf("║\n");
+    }
+    
+    printf("╠══════════════════════════════════════════════════╣\n");
+    printf("║ Subtotal:         R$ %.2f\n", ped->valor_total - ped->taxa_entrega);
+    
+    if (ped->eh_delivery) {
+        printf("║ Taxa de Entrega:  R$ %.2f\n", ped->taxa_entrega);
+    }
+    
+    printf("║ Valor Total:      R$ %.2f\n", ped->valor_total);
+    printf("╚══════════════════════════════════════════════════╝\n");
+}
