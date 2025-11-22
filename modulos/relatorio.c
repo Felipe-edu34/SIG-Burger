@@ -31,7 +31,6 @@ void menu_relatorio(){
 
 
 
-
 void exibindo_cardapio_por_categoria() {
     FILE *arq_item;
     Itemcardapio temp;
@@ -132,7 +131,6 @@ void exibindo_cardapio_por_categoria() {
         free(atual);
     }
 }
-
 
 
 
@@ -316,29 +314,57 @@ void relatorio_cardapio() {
 }
 
 
+void exibir_todo_o_estoque() {
 
-void exibir_todo_o_estoque(){
-
-    Produto* prod = (Produto*) malloc(sizeof(Produto));
     limpar_tela();
     printf("╔══════════════════════════════════════════════════╗\n");
     printf("║          EXIBIR TODOS OS ITENS DO ESTOQUE        ║\n");
     printf("╚══════════════════════════════════════════════════╝\n");
 
-    FILE* arq_estoque = fopen(ARQUIVO_ESTOQUE,"rb");
+    FILE* arq_estoque = fopen(ARQUIVO_ESTOQUE, "rb");
     if (arq_estoque == NULL) {
         printf("Erro ao abrir o arquivo de estoque.\n");
         limparBuffer();
         return;
     }
 
-    while (fread(prod, sizeof(Produto), 1, arq_estoque) == 1) {
-        exibir_item_estoque(prod);
+
+    Nodeproduto* inicio = NULL;
+    Nodeproduto* fim = NULL;
+
+    Produto temp;
+
+    while (fread(&temp, sizeof(Produto), 1, arq_estoque) == 1) {
+
+        Nodeproduto* novo = (Nodeproduto*) malloc(sizeof(Nodeproduto));
+        novo->dado = temp;
+        novo->prox = NULL;
+
+        if (inicio == NULL) {
+            inicio = novo;
+            fim = novo;
+        } else {
+            fim->prox = novo;
+            fim = novo;
+        }
     }
 
-
     fclose(arq_estoque);
-    free(prod);
+
+
+    Nodeproduto* atual = inicio;
+    while (atual != NULL) {
+        exibir_item_estoque(&atual->dado);
+        atual = atual->prox;
+    }
+
+    atual = inicio;
+    while (atual != NULL) {
+        Nodeproduto* aux = atual;
+        atual = atual->prox;
+        free(aux);
+    }
+
     pausar();
 }
 
