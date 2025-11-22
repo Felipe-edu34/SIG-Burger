@@ -578,6 +578,7 @@ void relatorio_estoque() {
     printf("║ ► 2. Itens com baixa quantidade                  ║\n");
     printf("║ ► 3. Itens indisponíveis                         ║\n");
     printf("║ ► 4. Itens por nome                              ║\n");
+    printf("║ ► 5. Listar estoque por quantidade               ║\n");
     printf("║                                                  ║\n");
     printf("╚══════════════════════════════════════════════════╝\n");
     printf("Escolha uma opção: ");
@@ -645,6 +646,9 @@ void relatorio() {
                             break;
                         case 4:
                             exibir_itens_por_nome();
+                            break;
+                        case 5:
+                            listar_estoque_por_quantidade();
                             break;
                         case 0:
                         default:
