@@ -307,11 +307,13 @@ void relatorio_cardapio() {
     printf("║ ► 2. Itens disponíveis                           ║\n");
     printf("║ ► 3. Itens indisponíveis                         ║\n");
     printf("║ ► 4. procurar item por categoria                 ║\n");
+    printf("║ ► 5. exibir itens por preço                      ║\n");
     printf("║                                                  ║\n");
     printf("╚══════════════════════════════════════════════════╝\n");
     printf("Escolha uma opção: ");
     
 }
+
 
 
 void exibir_todo_o_estoque() {
