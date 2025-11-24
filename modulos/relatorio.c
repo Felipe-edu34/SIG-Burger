@@ -162,7 +162,7 @@ void exibindo_cardapio_por_categoria() {
         novo->prox = NULL;
 
         // insere ordenado por categoria
-        if (lista == NULL || strcmp(novo->dado.categoria, lista->dado.categoria) < 0) {
+        if (lista == NULL || strcmp_sem_acento(novo->dado.categoria, lista->dado.categoria) < 0){
             novo->prox = lista;
             lista = novo;
         } else {
@@ -170,7 +170,7 @@ void exibindo_cardapio_por_categoria() {
             atual = lista->prox;
 
             while (atual != NULL &&
-                   strcmp(novo->dado.categoria, atual->dado.categoria) > 0) {
+                strcmp_sem_acento(novo->dado.categoria, atual->dado.categoria) > 0) {
                 anter = atual;
                 atual = atual->prox;
             }
