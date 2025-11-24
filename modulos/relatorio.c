@@ -117,16 +117,20 @@ void listar_itens_por_preco() {
 
     exibir_lista_itens(lista);
 
-    // liberar memória
-    NodeItem *tmp;
-    while (lista != NULL) {
-        tmp = lista;
-        lista = lista->prox;
-        free(tmp);
-    }
+    liberar_lista_estoque(lista);
 }
 
 
+
+void liberar_lista_estoque(NodeItem *lista) {
+    NodeItem *aux;
+
+    while (lista != NULL) {
+        aux = lista;          // guarda o nó atual
+        lista = lista->prox;  // avança
+        free(aux);            // libera o nó
+    }
+}
 
 
 
