@@ -37,6 +37,48 @@ void menu_relatorio(){
 
 
 
+NodeItem* montar_lista_itens_ordenados_preco() {
+
+    FILE *fp = fopen(ARQUIVO_ITEM, "rb");
+    if (!fp) return NULL;
+
+    NodeItem *lista = NULL;
+    NodeItem *novo, *atual, *anter;
+
+    Itemcardapio temp;
+
+    while (fread(&temp, sizeof(Itemcardapio), 1, fp) == 1) {
+
+        if (temp.disponivel == 0)
+            continue;
+
+        novo = (NodeItem*) malloc(sizeof(NodeItem));
+        novo->dado = temp;
+        novo->prox = NULL;
+
+        if (lista == NULL || novo->dado.preco < lista->dado.preco) {
+            novo->prox = lista;
+            lista = novo;
+        } else {
+            anter = lista;
+            atual = lista->prox;
+
+            while (atual != NULL && novo->dado.preco > atual->dado.preco) {
+                anter = atual;
+                atual = atual->prox;
+            }
+
+            anter->prox = novo;
+            novo->prox = atual;
+        }
+    }
+
+    fclose(fp);
+    return lista;
+}
+
+
+
 void exibindo_cardapio_por_categoria() {
     FILE *arq_item;
     Itemcardapio temp;
@@ -299,6 +341,48 @@ void exibindo_item_do_cardapio_por_preco() {
         lista = lista->prox;
         free(atual);
     }
+}
+
+
+
+NodeItem* montar_lista_itens_ordenados_preco() {
+
+    FILE *fp = fopen(ARQUIVO_ITEM, "rb");
+    if (!fp) return NULL;
+
+    NodeItem *lista = NULL;
+    NodeItem *novo, *atual, *anter;
+
+    Itemcardapio temp;
+
+    while (fread(&temp, sizeof(Itemcardapio), 1, fp) == 1) {
+
+        if (temp.disponivel == 0)
+            continue;
+
+        novo = (NodeItem*) malloc(sizeof(NodeItem));
+        novo->dado = temp;
+        novo->prox = NULL;
+
+        if (lista == NULL || novo->dado.preco < lista->dado.preco) {
+            novo->prox = lista;
+            lista = novo;
+        } else {
+            anter = lista;
+            atual = lista->prox;
+
+            while (atual != NULL && novo->dado.preco > atual->dado.preco) {
+                anter = atual;
+                atual = atual->prox;
+            }
+
+            anter->prox = novo;
+            novo->prox = atual;
+        }
+    }
+
+    fclose(fp);
+    return lista;
 }
 
 
