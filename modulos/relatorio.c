@@ -703,6 +703,87 @@ void relatorio_delivery_vs_local() {
     pausar();
 }
 
+void relatorio_itens_mais_pedidos() {
+    FILE *arq;
+    Pedido ped;
+    
+    typedef struct {
+        char nome[50];
+        int quantidade_total;
+        float valor_total;
+    } ItemRelatorio;
+    
+    ItemRelatorio itens[100];
+    int total_itens = 0;
+
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║           RELATÓRIO: ITENS MAIS PEDIDOS          ║\n");
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+
+    arq = fopen(ARQUIVO_PEDIDOS, "rb");
+    if (arq == NULL) {
+        printf("Nenhum pedido cadastrado ainda.\n");
+        pausar();
+        return;
+    }
+
+    while (fread(&ped, sizeof(Pedido), 1, arq) == 1) {
+        if (ped.ativo == 1) {
+            for (int i = 0; i < ped.total_itens; i++) {
+                int encontrado = 0;
+                
+                for (int j = 0; j < total_itens; j++) {
+                    if (strcmp(itens[j].nome, ped.itens[i].item.nome) == 0) {
+                        itens[j].quantidade_total += ped.itens[i].quantidade;
+                        itens[j].valor_total += ped.itens[i].item.preco * ped.itens[i].quantidade;
+                        encontrado = 1;
+                        break;
+                    }
+                }
+                
+                if (!encontrado && total_itens < 100) {
+                    strcpy(itens[total_itens].nome, ped.itens[i].item.nome);
+                    itens[total_itens].quantidade_total = ped.itens[i].quantidade;
+                    itens[total_itens].valor_total = ped.itens[i].item.preco * ped.itens[i].quantidade;
+                    total_itens++;
+                }
+            }
+        }
+    }
+
+    fclose(arq);
+
+    if (total_itens == 0) {
+        printf("Nenhum item encontrado.\n");
+        pausar();
+        return;
+    }
+
+    for (int i = 0; i < total_itens - 1; i++) {
+        for (int j = 0; j < total_itens - i - 1; j++) {
+            if (itens[j].quantidade_total < itens[j + 1].quantidade_total) {
+                ItemRelatorio temp = itens[j];
+                itens[j] = itens[j + 1];
+                itens[j + 1] = temp;
+            }
+        }
+    }
+
+    printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+
+    for (int i = 0; i < total_itens; i++) {
+        printf("%d. %s\n", i + 1, itens[i].nome);
+        printf("   Quantidade vendida: %d unidades\n", itens[i].quantidade_total);
+        printf("   Faturamento: R$ %.2f\n", itens[i].valor_total);
+        printf("\n");
+    }
+
+    printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+
+    pausar();
+}
+
 
 void relatorio() {
     int opcao, opcao_estoque, opcao_cardapio;
