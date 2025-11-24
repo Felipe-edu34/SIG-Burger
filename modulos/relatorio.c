@@ -117,7 +117,7 @@ void listar_itens_por_preco() {
 
     exibir_lista_itens(lista);
 
-    liberar_lista_estoque(lista);
+    liberar_lista_cardapio(lista);
 }
 
 
@@ -678,7 +678,7 @@ void relatorio() {
                             procurar_item_por_categoria();
                             break;
                         case 5:
-                            exibindo_item_do_cardapio_por_preco();
+                            listar_itens_por_preco();
                             break;
                         case 0:
                             printf("Voltando ao Menu de Relatórios...\n");
