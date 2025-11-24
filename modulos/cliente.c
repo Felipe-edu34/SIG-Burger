@@ -294,8 +294,6 @@ void cliente(void) {
                 excluir_cliente();
                 break;
             case 0:
-                printf("\n Retornando ao menu principal...\n");
-                pausar();
                 break;
             default:
                 printf("\n Opção inválida! Tente novamente.\n");
