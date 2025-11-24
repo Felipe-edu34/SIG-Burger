@@ -933,6 +933,23 @@ void relatorio_pedidos_por_data() {
     pausar();
 }
 
+void relatorio_pedidos() {
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║             RELATÓRIO DE PEDIDOS                 ║\n");
+    printf("╠══════════════════════════════════════════════════╣\n");
+    printf("║                                                  ║\n");
+    printf("║ ► 1. Todos os Pedidos                            ║\n");
+    printf("║ ► 2. Pedidos por Status                          ║\n");
+    printf("║ ► 3. Delivery vs Consumo Local                   ║\n");
+    printf("║ ► 4. Itens Mais Pedidos                          ║\n");
+    printf("║ ► 5. Histórico de Cliente                        ║\n");
+    printf("║ ► 6. Pedidos por Data                            ║\n");
+    printf("║                                                  ║\n");
+    printf("╚══════════════════════════════════════════════════╝\n");
+    printf("Escolha uma opção: ");
+}
+
 
 void relatorio() {
     int opcao, opcao_estoque, opcao_cardapio;
