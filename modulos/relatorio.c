@@ -644,6 +644,65 @@ void exibir_pedidos_por_status() {
     pausar();
 }
 
+void relatorio_delivery_vs_local() {
+    FILE *arq;
+    Pedido ped;
+    int total_delivery = 0, total_local = 0;
+    float valor_delivery = 0.0, valor_local = 0.0;
+    float taxa_total = 0.0;
+
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║       RELATÓRIO: DELIVERY VS CONSUMO LOCAL       ║\n");
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+
+    arq = fopen(ARQUIVO_PEDIDOS, "rb");
+    if (arq == NULL) {
+        printf("Nenhum pedido cadastrado ainda.\n");
+        pausar();
+        return;
+    }
+
+    while (fread(&ped, sizeof(Pedido), 1, arq) == 1) {
+        if (ped.ativo == 1) {
+            if (ped.eh_delivery) {
+                total_delivery++;
+                valor_delivery += ped.valor_total;
+                taxa_total += ped.taxa_entrega;
+            } else {
+                total_local++;
+                valor_local += ped.valor_total;
+            }
+        }
+    }
+
+    fclose(arq);
+
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║                    DELIVERY                      ║\n");
+    printf("╠══════════════════════════════════════════════════╣\n");
+    printf("║ Quantidade de Pedidos: %-26d║\n", total_delivery);
+    printf("║ Faturamento: R$ %-33.2f║\n", valor_delivery);
+    printf("║ Total em Taxas: R$ %-30.2f║\n", taxa_total);
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║                 CONSUMO NO LOCAL                 ║\n");
+    printf("╠══════════════════════════════════════════════════╣\n");
+    printf("║ Quantidade de Pedidos: %-26d║\n", total_local);
+    printf("║ Faturamento: R$ %-33.2f║\n", valor_local);
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║                  RESUMO GERAL                    ║\n");
+    printf("╠══════════════════════════════════════════════════╣\n");
+    printf("║ Total de Pedidos: %-30d║\n", total_delivery + total_local);
+    printf("║ Faturamento Total: R$ %-27.2f║\n", valor_delivery + valor_local);
+    printf("╚══════════════════════════════════════════════════╝\n");
+
+    pausar();
+}
+
 
 void relatorio() {
     int opcao, opcao_estoque, opcao_cardapio;
