@@ -6,9 +6,12 @@
 #include "relatorio.h"
 #include "cliente.h"
 #include "cardapio.h"
+#include "pedido.h"
 
 #define ARQUIVO_ITEM "dados/item_cardapio.dat"
 #define ARQUIVO_ESTOQUE "dados/estoque.dat"
+#define ARQUIVO_PEDIDOS "dados/pedidos.dat"
+#define ARQUIVO_CLIENTES "dados/clientes.dat"
 
 
 void menu_relatorio(){
@@ -582,6 +585,64 @@ void relatorio_estoque() {
     
 }   
 
+///////////////////////////////////////////////////////////////////////////////
+// RELATÓRIOS DOS PEDIDOS
+///////////////////////////////////////////////////////////////////////////////
+
+void exibir_pedidos_por_status() {
+    FILE *arq;
+    Pedido ped;
+    char status_busca[20];
+    int contador = 0;
+
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║           RELATÓRIO DE PEDIDOS POR STATUS        ║\n");
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+
+    printf("Status disponíveis:\n");
+    printf("1. Em preparo\n");
+    printf("2. Saiu para entrega\n");
+    printf("3. Entregue\n\n");
+    printf("Digite o status: ");
+    ler_string(status_busca, sizeof(status_busca));
+
+    arq = fopen(ARQUIVO_PEDIDOS, "rb");
+    if (arq == NULL) {
+        printf("\nNenhum pedido cadastrado ainda.\n");
+        pausar();
+        return;
+    }
+
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║         PEDIDOS COM STATUS: %-20s║\n", status_busca);
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+    printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+
+    while (fread(&ped, sizeof(Pedido), 1, arq) == 1) {
+        if (ped.ativo == 1 && strcmp(ped.status, status_busca) == 0) {
+            contador++;
+            printf("Pedido #%d\n", ped.numero_pedido);
+            printf("Cliente: %s\n", ped.nome_cliente);
+            printf("Telefone: %s\n", ped.telefone_cliente);
+            printf("Tipo: %s\n", ped.eh_delivery ? "DELIVERY" : "CONSUMO NO LOCAL");
+            printf("Data: %s\n", ped.data);
+            printf("Valor: R$ %.2f\n", ped.valor_total);
+            printf("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+        }
+    }
+
+    fclose(arq);
+
+    if (contador == 0) {
+        printf("Nenhum pedido encontrado com esse status.\n");
+    } else {
+        printf("Total: %d pedidos\n", contador);
+    }
+
+    pausar();
+}
 
 
 void relatorio() {
