@@ -433,6 +433,18 @@ void exibir_lista_estoque(Nodeproduto *lista) {
 
 
 
+void liberar_lista(Nodeproduto *lista) {
+    Nodeproduto *temp;
+
+    while (lista != NULL) {
+        temp = lista;
+        lista = lista->prox;
+        free(temp);
+    }
+}
+
+
+
 void listar_todo_estoque() {
     Nodeproduto *lista = montar_lista_estoque();
     if (!lista) {
@@ -534,70 +546,6 @@ void exibir_itens_por_nome() {
 
 
 
-Nodeproduto* montar_lista_ordenada_por_quantidade() {
-
-    FILE* arq = fopen(ARQUIVO_ESTOQUE, "rb");
-    if (!arq) {
-        printf("Erro ao abrir arquivo de estoque.\n");
-        return NULL;
-    }
-
-    Nodeproduto* lista = NULL;
-    Nodeproduto* tail = NULL;
-    Produto temp;
-
-
-    while (fread(&temp, sizeof(Produto), 1, arq) == 1) {
-
-        Nodeproduto* novo = malloc(sizeof(Nodeproduto));
-        novo->dado = temp;
-        novo->prox = NULL;
-
-        if (lista == NULL) {
-            lista = novo;
-            tail = novo;
-        } else {
-            tail->prox = novo;
-            tail = novo;
-        }
-    }
-
-    fclose(arq);
-
-    // =======================================
-    // =========== ORDENAÇÃO =================
-    // =======================================
-
-    if (!lista) return NULL;
-
-    int trocou;
-    Nodeproduto *p;
-    Nodeproduto *ultimo = NULL;
-
-    do {
-        trocou = 0;
-        p = lista;
-
-        while (p->prox != ultimo) {
-            if (p->dado.quantidade > p->prox->dado.quantidade) {
-
-                Produto aux = p->dado;
-                p->dado = p->prox->dado;
-                p->prox->dado = aux;
-
-                trocou = 1;
-            }
-            p = p->prox;
-        }
-        ultimo = p;
-
-    } while (trocou);
-
-    return lista;
-}
-
-
-
 void listar_estoque_por_quantidade() {
     Nodeproduto *lista = montar_lista_estoque();
     if (!lista) {
@@ -613,18 +561,6 @@ void listar_estoque_por_quantidade() {
 
     liberar_lista(lista);
     pausar();
-}
-
-
-
-void liberar_lista(Nodeproduto *lista) {
-    Nodeproduto *temp;
-
-    while (lista != NULL) {
-        temp = lista;
-        lista = lista->prox;
-        free(temp);
-    }
 }
 
 
