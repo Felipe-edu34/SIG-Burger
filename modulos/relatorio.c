@@ -874,6 +874,65 @@ void relatorio_historico_cliente() {
     pausar();
 }
 
+void relatorio_pedidos_por_data() {
+    FILE *arq;
+    Pedido ped;
+    char data_busca[11];
+    int contador = 0;
+    float total_dia = 0.0;
+
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║          RELATÓRIO: PEDIDOS POR DATA             ║\n");
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+
+    printf("► Data (DD/MM/AAAA): ");
+    ler_string(data_busca, sizeof(data_busca));
+
+    arq = fopen(ARQUIVO_PEDIDOS, "rb");
+    if (arq == NULL) {
+        printf("\nNenhum pedido cadastrado ainda.\n");
+        pausar();
+        return;
+    }
+
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║         PEDIDOS DO DIA: %-24s║\n", data_busca);
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+    printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+
+    while (fread(&ped, sizeof(Pedido), 1, arq) == 1) {
+        if (ped.ativo == 1 && strcmp(ped.data, data_busca) == 0) {
+            contador++;
+            total_dia += ped.valor_total;
+
+            printf("Pedido #%d\n", ped.numero_pedido);
+            printf("Cliente: %s\n", ped.nome_cliente);
+            printf("Tipo: %s\n", ped.eh_delivery ? "DELIVERY" : "CONSUMO NO LOCAL");
+            printf("Status: %s\n", ped.status);
+            printf("Valor: R$ %.2f\n", ped.valor_total);
+            printf("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+        }
+    }
+
+    fclose(arq);
+
+    if (contador == 0) {
+        printf("Nenhum pedido encontrado nesta data.\n");
+    } else {
+        printf("╔══════════════════════════════════════════════════╗\n");
+        printf("║                RESUMO DO DIA                     ║\n");
+        printf("╠══════════════════════════════════════════════════╣\n");
+        printf("║ Total de Pedidos: %-30d║\n", contador);
+        printf("║ Faturamento: R$ %-33.2f║\n", total_dia);
+        printf("║ Ticket Médio: R$ %-31.2f║\n", contador > 0 ? total_dia / contador : 0.0);
+        printf("╚══════════════════════════════════════════════════╝\n");
+    }
+
+    pausar();
+}
+
 
 void relatorio() {
     int opcao, opcao_estoque, opcao_cardapio;
