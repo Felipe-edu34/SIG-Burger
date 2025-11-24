@@ -56,6 +56,35 @@ char* ler_string(char* destino, int tamanho) {
 
 
 
+char remover_acento(char c) {
+    unsigned char uc = (unsigned char)c;
+
+    switch (uc) {
+        case 0xC1: case 0xE1: return 'a'; // á Á
+        case 0xC2: case 0xE2: return 'a'; // â Â
+        case 0xC0: case 0xE0: return 'a'; // à À
+        case 0xC3: case 0xE3: return 'a'; // ã Ã
+
+        case 0xC9: case 0xE9: return 'e'; // é É
+        case 0xCA: case 0xEA: return 'e'; // ê Ê
+
+        case 0xCD: case 0xED: return 'i'; // í Í
+
+        case 0xD3: case 0xF3: return 'o'; // ó Ó
+        case 0xD4: case 0xF4: return 'o'; // ô Ô
+        case 0xD5: case 0xF5: return 'o'; // õ Õ
+
+        case 0xDA: case 0xFA: return 'u'; // ú Ú
+
+        case 0xC7: case 0xE7: return 'c'; // ç Ç
+    }
+
+    return c;
+}
+
+
+
+
 void tela_inicial () {
     limpar_tela();
     printf("\n\n\n\n\n\n\n");
