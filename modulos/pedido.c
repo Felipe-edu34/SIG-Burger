@@ -138,7 +138,7 @@ void cadastrar_pedido() {
     }
 
     ler_data_pedido(ped->data);
-
+    limpar_tela();
     printf("\n╔══════════════════════════════════════════════════╗\n");
     printf("║           ADICIONAR ITENS AO PEDIDO              ║\n");
     printf("╚══════════════════════════════════════════════════╝\n\n");
