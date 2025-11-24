@@ -784,6 +784,96 @@ void relatorio_itens_mais_pedidos() {
     pausar();
 }
 
+void relatorio_historico_cliente() {
+    FILE *arq_ped, *arq_cli;
+    Pedido ped;
+    Cliente cli;
+    char telefone_busca[15];
+    int contador = 0;
+    float total_gasto = 0.0;
+
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║        RELATÓRIO: HISTÓRICO DO CLIENTE           ║\n");
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+
+    printf("► Telefone do Cliente: ");
+    ler_string(telefone_busca, sizeof(telefone_busca));
+
+    arq_cli = fopen(ARQUIVO_CLIENTES, "rb");
+    if (arq_cli == NULL) {
+        printf("\nNenhum cliente cadastrado.\n");
+        pausar();
+        return;
+    }
+
+    int cliente_encontrado = 0;
+    while (fread(&cli, sizeof(Cliente), 1, arq_cli) == 1) {
+        if (cli.status == 1 && strcmp(cli.telefone, telefone_busca) == 0) {
+            cliente_encontrado = 1;
+            limpar_tela();
+            printf("╔══════════════════════════════════════════════════╗\n");
+            printf("║              DADOS DO CLIENTE                    ║\n");
+            printf("╠══════════════════════════════════════════════════╣\n");
+            printf("║ Nome: %-43s║\n", cli.nome);
+            printf("║ Telefone: %-39s║\n", cli.telefone);
+            printf("║ Endereço: %-39s║\n", cli.endereco);
+            printf("╚══════════════════════════════════════════════════╝\n\n");
+            break;
+        }
+    }
+    fclose(arq_cli);
+
+    if (!cliente_encontrado) {
+        printf("\nCliente não encontrado.\n");
+        pausar();
+        return;
+    }
+
+    arq_ped = fopen(ARQUIVO_PEDIDOS, "rb");
+    if (arq_ped == NULL) {
+        printf("Nenhum pedido cadastrado.\n");
+        pausar();
+        return;
+    }
+
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║              HISTÓRICO DE PEDIDOS                ║\n");
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+    printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+
+    while (fread(&ped, sizeof(Pedido), 1, arq_ped) == 1) {
+        if (ped.ativo == 1 && strcmp(ped.telefone_cliente, telefone_busca) == 0) {
+            contador++;
+            total_gasto += ped.valor_total;
+
+            printf("Pedido #%d\n", ped.numero_pedido);
+            printf("Data: %s\n", ped.data);
+            printf("Status: %s\n", ped.status);
+            printf("Tipo: %s\n", ped.eh_delivery ? "DELIVERY" : "CONSUMO NO LOCAL");
+            printf("Itens: %d\n", ped.total_itens);
+            printf("Valor: R$ %.2f\n", ped.valor_total);
+            printf("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+        }
+    }
+
+    fclose(arq_ped);
+
+    if (contador == 0) {
+        printf("Este cliente ainda não fez pedidos.\n");
+    } else {
+        printf("╔══════════════════════════════════════════════════╗\n");
+        printf("║                    RESUMO                        ║\n");
+        printf("╠══════════════════════════════════════════════════╣\n");
+        printf("║ Total de Pedidos: %-30d║\n", contador);
+        printf("║ Total Gasto: R$ %-33.2f║\n", total_gasto);
+        printf("║ Ticket Médio: R$ %-31.2f║\n", contador > 0 ? total_gasto / contador : 0.0);
+        printf("╚══════════════════════════════════════════════════╝\n");
+    }
+
+    pausar();
+}
+
 
 void relatorio() {
     int opcao, opcao_estoque, opcao_cardapio;
