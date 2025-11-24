@@ -37,6 +37,103 @@ void menu_relatorio(){
 
 
 
+NodeItem* montar_lista_itens_ordenados_preco() {
+
+    FILE *fp = fopen(ARQUIVO_ITEM, "rb");
+    if (!fp) return NULL;
+
+    NodeItem *lista = NULL;
+    NodeItem *novo, *atual, *anter;
+
+    Itemcardapio temp;
+
+    while (fread(&temp, sizeof(Itemcardapio), 1, fp) == 1) {
+
+        if (temp.disponivel == 0)
+            continue;
+
+        novo = (NodeItem*) malloc(sizeof(NodeItem));
+        novo->dado = temp;
+        novo->prox = NULL;
+
+        if (lista == NULL || novo->dado.preco < lista->dado.preco) {
+            novo->prox = lista;
+            lista = novo;
+        } else {
+            anter = lista;
+            atual = lista->prox;
+
+            while (atual != NULL && novo->dado.preco > atual->dado.preco) {
+                anter = atual;
+                atual = atual->prox;
+            }
+
+            anter->prox = novo;
+            novo->prox = atual;
+        }
+    }
+
+    fclose(fp);
+    return lista;
+}
+
+
+
+void exibir_lista_itens(NodeItem *lista) {
+
+    limpar_tela();
+
+    printf("ID   %-25s %-15s %-10s\n", "Nome", "Categoria", "Preço");
+    printf("-----------------------------------------------------------------\n");
+
+    int id = 1;
+    NodeItem *p = lista;
+
+    while (p != NULL) {
+        printf("%-4d %-25s %-15s R$ %.2f\n",
+               id,
+               p->dado.nome,
+               p->dado.categoria,
+               p->dado.preco);
+
+        p = p->prox;
+        id++;
+    }
+
+    pausar();
+}
+
+
+
+void listar_itens_por_preco() {
+
+    NodeItem *lista = montar_lista_itens_ordenados_preco();
+
+    if (!lista) {
+        printf("Nenhum item disponível no cardápio.\n");
+        pausar();
+        return;
+    }
+
+    exibir_lista_itens(lista);
+
+    liberar_lista_cardapio(lista);
+}
+
+
+
+void liberar_lista_cardapio(NodeItem *lista) {
+    NodeItem *aux;
+
+    while (lista != NULL) {
+        aux = lista;          // guarda o nó atual
+        lista = lista->prox;  // avança
+        free(aux);            // libera o nó
+    }
+}
+
+
+
 void exibindo_cardapio_por_categoria() {
     FILE *arq_item;
     Itemcardapio temp;
@@ -221,84 +318,6 @@ void procurar_item_por_categoria() {
     pausar();
 
 
-}
-
-
-
-void exibindo_item_do_cardapio_por_preco() {
-    FILE *fp;
-    NodeItem *lista = NULL;
-    NodeItem *novo, *atual, *anter;
-
-    fp = fopen(ARQUIVO_ITEM, "rb");
-    if (fp == NULL) {
-        printf("Erro ao abrir o arquivo do cardápio!\n");
-        pausar();
-        return;
-    }
-
-    // Lendo o arquivo e montando a lista ORDENADA
-    Itemcardapio temp;
-
-    while (fread(&temp, sizeof(Itemcardapio), 1, fp) == 1) {
-
-        // pula itens indisponíveis
-        if (temp.disponivel == 0) 
-            continue;
-
-        novo = (NodeItem*) malloc(sizeof(NodeItem));
-        novo->dado = temp;
-        novo->prox = NULL;
-
-        // Inserção ordenada
-        if (lista == NULL || novo->dado.preco < lista->dado.preco) {
-            novo->prox = lista;
-            lista = novo;
-        } else {
-            anter = lista;
-            atual = lista->prox;
-
-            while (atual != NULL && novo->dado.preco > atual->dado.preco) {
-                anter = atual;
-                atual = atual->prox;
-            }
-
-            anter->prox = novo;
-            novo->prox = atual;
-        }
-    }
-
-    fclose(fp);
-
-    limpar_tela();
-    printf("╔══════════════════════════════════════════════════╗\n");
-    printf("║            ITENS DO CARDÁPIO POR PREÇO           ║\n");
-    printf("╠══════════════════════════════════════════════════╣\n");
-
-    // Exibindo lista
-    int i = 1;
-    atual = lista;
-    while (atual != NULL) {
-
-        printf("║  %d) %s\n", i, atual->dado.nome);
-        printf("║     Categoria : %s\n", atual->dado.categoria);
-        printf("║     Preço     : R$ %.2f\n", atual->dado.preco);
-        printf("║     Status    : Disponível\n");
-        printf("║--------------------------------------------------║\n");
-
-        atual = atual->prox;
-        i++;
-    }
-
-    printf("╚══════════════════════════════════════════════════╝\n");
-    pausar();
-
-    // Liberando memória
-    while (lista != NULL) {
-        atual = lista;
-        lista = lista->prox;
-        free(atual);
-    }
 }
 
 
@@ -659,7 +678,7 @@ void relatorio() {
                             procurar_item_por_categoria();
                             break;
                         case 5:
-                            exibindo_item_do_cardapio_por_preco();
+                            listar_itens_por_preco();
                             break;
                         case 0:
                             printf("Voltando ao Menu de Relatórios...\n");

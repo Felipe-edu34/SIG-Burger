@@ -1,13 +1,15 @@
 #ifndef RELATORIO_H
 #define RELATORIO_H
 #include "estoque.h"
+#include "cardapio.h"
 
 
 
 void menu_relatorio();
 void relatorio();
-void exibindo_cardapio_por_categoria();
+void relatorio_estoque();
 void relatorio_cardapio();
+void exibindo_cardapio_por_categoria();
 void relatorio_cardapio_itens_disponiveis();
 void relatorio_cardapio_itens_indisponiveis();
 void procurar_item_por_categoria();
@@ -21,7 +23,10 @@ void ordenar_por_quantidade(Nodeproduto *lista);
 Nodeproduto* montar_lista_estoque();
 void listar_todo_estoque();
 void exibir_lista_estoque(Nodeproduto *lista);
-
+NodeItem* montar_lista_itens_ordenados_preco();
+void liberar_lista_cardapio(NodeItem *lista);
+void listar_itens_por_preco();
+void exibir_lista_itens(NodeItem *lista);
 
 
 
