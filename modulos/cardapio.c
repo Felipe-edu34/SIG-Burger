@@ -47,10 +47,6 @@ int confirma_dados_cardapio(Itemcardapio* item) {
 
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 int compararCategorias(const void *a, const void *b) {
     const Itemcardapio *itemA = (const Itemcardapio*)a;
     const Itemcardapio *itemB = (const Itemcardapio*)b;
@@ -72,7 +68,7 @@ ResultadoBuscacardapio selecionar_produto_cardapio() {
         return resultado;
     }
 
-    // -------- 1) LER TODA A LISTA PARA UM VETOR ----------
+ 
     while (fread(&temp, sizeof(Itemcardapio), 1, arq) == 1) {
         if (temp.disponivel == 1) {
             lista = realloc(lista, (total + 1) * sizeof(Itemcardapio));
@@ -88,10 +84,8 @@ ResultadoBuscacardapio selecionar_produto_cardapio() {
         return resultado;
     }
 
-    // ---- 2) ORDENAR PELA CATEGORIA (bebida → comida → etc) ----
     qsort(lista, total, sizeof(Itemcardapio), compararCategorias);
 
-    // -------- 3) MOSTRAR LISTA ORDENADA ----------
     printf("Produtos disponíveis:\n\n");
 
     for (int i = 0; i < total; i++) {
@@ -104,7 +98,7 @@ ResultadoBuscacardapio selecionar_produto_cardapio() {
         );
     }
 
-    // -------- 4) ESCOLHER PRODUTO ----------
+
     int numero;
     printf("\nEscolha o produto: ");
     scanf("%d", &numero);
