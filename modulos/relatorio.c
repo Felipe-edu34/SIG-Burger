@@ -568,20 +568,29 @@ void listar_estoque_por_quantidade() {
 void relatorio_estoque() { 
     limpar_tela();
     printf("╔══════════════════════════════════════════════════╗\n");
-    printf("║               RELATÓRIO DO ESTOQUE               ║\n");
+    printf("║               RELATORIO CLIENTES                 ║\n");
     printf("╠══════════════════════════════════════════════════╣\n");
     printf("║                                                  ║\n");
-    printf("║ ► 1. exibir estoque completo                     ║\n");
-    printf("║ ► 2. Itens com baixa quantidade                  ║\n");
-    printf("║ ► 3. Itens indisponíveis                         ║\n");
-    printf("║ ► 4. Itens por nome                              ║\n");
-    printf("║ ► 5. Listar estoque por quantidade               ║\n");
+    printf("║ ► 1. Exibir todos os clientes                    ║\n");
+    printf("║ ► 2. Clientes com pedidos ativos                 ║\n");
+    printf("║ ► 3. ultimo pedido por cliente                   ║\n");
+    printf("║ ► 4. Procurar cliente por nome                   ║\n");
+    printf("║ ► 5. Listar clientes por ordem alfabética        ║\n");
     printf("║                                                  ║\n");
     printf("╚══════════════════════════════════════════════════╝\n");
     printf("Escolha uma opção: ");
-    
-}   
 
+}
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// RELATÓRIOS CLIENTES
+//////////////////////////////////////////////////////////////////////////////////////////
+
+void relatorio_clientes() {
+    
+}
 
 
 void relatorio() {
