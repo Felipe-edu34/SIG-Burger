@@ -13,5 +13,7 @@ void ler_nome_cliente(char *nome);
 void ler_telefone_cliente(char *telefone);
 void ler_endereco_entrega(char *endereco);
 void ler_data_pedido(char *data);
+void ler_cpf_cliente(char *cpf);
+void ler_endereco_cliente(char *endereco);
 
 #endif // LEITURA_H
