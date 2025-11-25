@@ -47,69 +47,81 @@ int confirma_dados_cardapio(Itemcardapio* item) {
 
 
 
+int compararCategorias(const void *a, const void *b) {
+    const Itemcardapio *itemA = (const Itemcardapio*)a;
+    const Itemcardapio *itemB = (const Itemcardapio*)b;
+
+    return strcmp(itemA->categoria, itemB->categoria);
+}
+
 ResultadoBuscacardapio selecionar_produto_cardapio() {
     FILE *arq;
-    Itemcardapio* item = (Itemcardapio*) malloc(sizeof(Itemcardapio));
-    int contador = 0, numero;
+    Itemcardapio temp;
+    Itemcardapio *lista = NULL;
+    int total = 0;
+
     ResultadoBuscacardapio resultado = {0, NULL, 0};
 
     arq = fopen(ARQUIVO_ITEM, "rb");
-    if (arq == NULL) {
+    if (!arq) {
         printf("Nenhum produto cadastrado.\n");
-        free(item);
         return resultado;
     }
 
-    printf("Produtos disponíveis:\n\n");
-    while (fread(item, sizeof(Itemcardapio), 1, arq) == 1) {
-        if (item->disponivel == 1) {
-            contador++;
-            printf(" %d - %s ( Categoria: %s)\n",
-                   contador, item->nome, item->categoria);
+ 
+    while (fread(&temp, sizeof(Itemcardapio), 1, arq) == 1) {
+        if (temp.disponivel == 1) {
+            lista = realloc(lista, (total + 1) * sizeof(Itemcardapio));
+            lista[total] = temp;
+            total++;
         }
     }
     fclose(arq);
 
-    if (contador == 0) {
-        printf("\nNenhum produto ativo.\n");
-        free(item);
+    if (total == 0) {
+        printf("Nenhum produto ativo.\n");
+        free(lista);
         return resultado;
     }
 
+    qsort(lista, total, sizeof(Itemcardapio), compararCategorias);
+
+    printf("Produtos disponíveis:\n\n");
+
+    for (int i = 0; i < total; i++) {
+        printf("%3d | %-20s | %-12s | %-80s | R$ %7.2f\n",
+            i + 1,
+            lista[i].nome,
+            lista[i].categoria,
+            lista[i].descricao,
+            lista[i].preco
+        );
+    }
+
+
+    int numero;
     printf("\nEscolha o produto: ");
     scanf("%d", &numero);
     limparBuffer();
 
-    if (numero < 1 || numero > contador) {
-        printf("\nNúmero inválido!\n");
-        free(item);
+    if (numero < 1 || numero > total) {
+        printf("Número inválido!\n");
+        free(lista);
         return resultado;
     }
 
-    // Reabrir arquivo para obter a posição real
-    arq = fopen(ARQUIVO_ITEM, "rb");
-    contador = 0;
+    // -------- 5) PREPARAR RESULTADO ----------
+    resultado.item = malloc(sizeof(Itemcardapio));
+    *resultado.item = lista[numero - 1];
+    resultado.existe = 1;
 
-    while (fread(item, sizeof(Itemcardapio), 1, arq) == 1) {
+    // A posição no arquivo não faz mais sentido com ordenação,
+    // então NÃO usamos mais ftell + offset.
 
-        if (item->disponivel == 1) {
-            contador++;
-            if (contador == numero) {
-
-                resultado.pos = ftell(arq) - sizeof(Itemcardapio);
-                resultado.item = item;
-                resultado.existe = 1;
-
-                fclose(arq);
-                return resultado;
-            }
-        }
-    }
-
-    fclose(arq);
-    free(item);
+    free(lista);
     return resultado;
 }
+
 
 
 

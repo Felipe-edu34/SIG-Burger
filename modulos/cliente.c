@@ -3,6 +3,7 @@
 #include <string.h>
 #include "utils.h"
 #include "cliente.h"
+#include "leitura.h"
 
 #define ARQUIVO_CLIENTES "dados/clientes.dat"
 
@@ -24,7 +25,7 @@ void menu_clientes(void) {
 }
 
 void cadastrar_cliente(void) {
-    Cliente cli;
+    Cliente* cli = (Cliente*) malloc(sizeof(Cliente));
     FILE* fp;
     
     limpar_tela();
@@ -33,30 +34,29 @@ void cadastrar_cliente(void) {
     printf("        ║            CADASTRAR NOVO CLIENTE                ║\n");
     printf("        ╚══════════════════════════════════════════════════╝\n\n");
     
-    printf("        Nome completo: ");
-    ler_string(cli.nome, sizeof(cli.nome));
-    
-    printf("        Telefone: ");
-    ler_string(cli.telefone, sizeof(cli.telefone));
-    
-    printf("        Endereço completo: ");
-    ler_string(cli.endereco, sizeof(cli.endereco));
-    
-    cli.status = 1;
+    ler_cpf_cliente(cli->cpf);
+    ler_nome_cliente(cli->nome);
+    ler_telefone_cliente(cli->telefone);
+    ler_endereco_entrega(cli->endereco);
+
+    cli->status = 1;
     
     fp = fopen(ARQUIVO_CLIENTES, "ab");
     if (fp == NULL) {
         printf("\n Erro ao abrir arquivo!\n");
         pausar();
+        free(cli);
         return;
     }
     
-    fwrite(&cli, sizeof(Cliente), 1, fp);
-    fclose(fp);
+    fwrite(cli, sizeof(Cliente), 1, fp);  
+
+    free(cli);
     
     printf("\n Cliente cadastrado com sucesso!\n");
     pausar();
 }
+
 
 void listar_clientes(void) {
     FILE* fp;
@@ -82,6 +82,7 @@ void listar_clientes(void) {
         if (cli.status == 1) {
             contador++;
             printf("        Cliente %d\n", contador);
+            printf("        CPF: %s\n", cli.cpf);
             printf("        Nome: %s\n", cli.nome);
             printf("        Telefone: %s\n", cli.telefone);
             printf("        Endereço: %s\n", cli.endereco);
@@ -165,20 +166,17 @@ void editar_cliente(void) {
     }
     
     printf("\n        Dados atuais:\n");
+    printf("        CPF: %s\n", cli.cpf);
     printf("        Nome: %s\n", cli.nome);
     printf("        Telefone: %s\n", cli.telefone);
     printf("        Endereço: %s\n", cli.endereco);
     
     printf("\n        Novos dados:\n\n");
     
-    printf("        Novo nome: ");
-    ler_string(cli.nome, sizeof(cli.nome));
     
-    printf("        Novo telefone: ");
-    ler_string(cli.telefone, sizeof(cli.telefone));
-    
-    printf("        Novo endereço: ");
-    ler_string(cli.endereco, sizeof(cli.endereco));
+    ler_nome_cliente(cli.nome);
+    ler_telefone_cliente(cli.telefone);
+    ler_endereco_cliente(cli.endereco);
     
     fseek(fp, pos_arquivo, SEEK_SET);
     fwrite(&cli, sizeof(Cliente), 1, fp);
@@ -294,8 +292,6 @@ void cliente(void) {
                 excluir_cliente();
                 break;
             case 0:
-                printf("\n Retornando ao menu principal...\n");
-                pausar();
                 break;
             default:
                 printf("\n Opção inválida! Tente novamente.\n");
