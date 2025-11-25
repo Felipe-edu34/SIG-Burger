@@ -124,3 +124,24 @@ void ler_data_pedido(char *data) {
         }
     } while (!valida_data(data));
 }
+
+
+
+void ler_cpf_cliente(char *cpf) {
+    do {
+        printf("► CPF (somente números): ");
+        ler_string(cpf, 15);
+        if (!valida_cpf(cpf)) {
+            printf("CPF inválido! Deve conter 11 dígitos numéricos.\n");
+        }
+    } while (!valida_cpf(cpf));
+}
+
+
+
+void ler_endereco_cliente(char *endereco) {
+    do {
+        printf("► Endereço: ");
+        ler_string(endereco, 200);
+    } while (!valida_endereco(endereco));
+}
