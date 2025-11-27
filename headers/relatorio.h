@@ -10,6 +10,7 @@ void relatorio();
 void relatorio_estoque();
 void relatorio_cardapio();
 void exibindo_cardapio_por_categoria();
+void relatorio_itens_por_status(int status, const char* titulo);
 void relatorio_cardapio_itens_disponiveis();
 void relatorio_cardapio_itens_indisponiveis();
 void procurar_item_por_categoria();
