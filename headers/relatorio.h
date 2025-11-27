@@ -30,6 +30,13 @@ void listar_itens_por_preco();
 void exibir_lista_itens(NodeItem *lista);
 void relatorio_clientes();
 void relatorio_clientes_com_ultimo_pedido();
+void exibir_pedidos_por_status();
+void relatorio_delivery_vs_local();
+void relatorio_itens_mais_pedidos();
+void relatorio_historico_cliente();
+void relatorio_pedidos_por_data();
+void relatorio_pedidos();
+
 
 
 
