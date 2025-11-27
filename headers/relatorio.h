@@ -10,6 +10,7 @@ void relatorio();
 void relatorio_estoque();
 void relatorio_cardapio();
 void exibindo_cardapio_por_categoria();
+void relatorio_itens_por_status(int status, const char* titulo);
 void relatorio_cardapio_itens_disponiveis();
 void relatorio_cardapio_itens_indisponiveis();
 void procurar_item_por_categoria();
@@ -29,6 +30,13 @@ void listar_itens_por_preco();
 void exibir_lista_itens(NodeItem *lista);
 void relatorio_clientes();
 void relatorio_clientes_com_ultimo_pedido();
+void exibir_pedidos_por_status();
+void relatorio_delivery_vs_local();
+void relatorio_itens_mais_pedidos();
+void relatorio_historico_cliente();
+void relatorio_pedidos_por_data();
+void relatorio_pedidos();
+
 
 
 

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "utils.h"
 #include "estoque.h"
 #include "relatorio.h"
@@ -215,7 +216,10 @@ void exibindo_cardapio_por_categoria() {
         if (strlen(atual->dado.descricao) > 0) {
             char desc[140];
             snprintf(desc, sizeof(desc), "↳ %s", atual->dado.descricao);
-            printf("║    %-90s║\n", desc);
+            if (strlen(desc) > 90)
+            desc[90] = '\0';
+        
+        printf("║    %-90s║\n", desc);
         }
 
         printf("║                                                                                            ║\n");
@@ -230,70 +234,76 @@ void exibindo_cardapio_por_categoria() {
     printf("╚════════════════════════════════════════════════════════════════════════════════════════════╝\n");
     pausar();
 
-    // 3 — LIBERA MEMÓRIA
-    while (lista != NULL) {
-        atual = lista;
-        lista = lista->prox;
-        free(atual);
-    }
+    liberar_lista_cardapio(lista);
 }
 
 
 
 void relatorio_cardapio_itens_disponiveis() {
+    relatorio_itens_por_status(1, "ITEMS DISPONÍVEIS NO CARDÁPIO");
+}
 
+
+
+void relatorio_cardapio_itens_indisponiveis() {
+    relatorio_itens_por_status(0, "ITEMS INDISPONÍVEIS NO CARDÁPIO");
+}
+
+
+
+void relatorio_itens_por_status(int status, const char *titulo) {
     limpar_tela();
     printf("╔══════════════════════════════════════════════════╗\n");
-    printf("║           ITEM DISPONIVEIS NO CARDAPIO           ║\n");
+    printf("║ %50s ║\n", titulo);
     printf("╚══════════════════════════════════════════════════╝\n");
 
-    Itemcardapio* item = (Itemcardapio*) malloc(sizeof(Itemcardapio));
-    FILE* arq_cardapio = fopen(ARQUIVO_ITEM,"rb");
-    if (arq_cardapio == NULL) {
+    Itemcardapio *item = malloc(sizeof(Itemcardapio));
+    FILE *arq = fopen(ARQUIVO_ITEM, "rb");
+
+    if (arq == NULL) {
         printf("Erro ao abrir o arquivo de cardapio.\n");
         limparBuffer();
+        free(item);
         return;
     }
-    while (fread(item, sizeof(Itemcardapio), 1, arq_cardapio) == 1) {
-        if(item->disponivel == 1){
-        exibir_item(item);
+
+    while (fread(item, sizeof(Itemcardapio), 1, arq) == 1) {
+        if (item->disponivel == status) {
+            exibir_item(item);
         }
     }
-    fclose(arq_cardapio);
+
+    fclose(arq);
     free(item);
     pausar();
 }
 
 
 
-void relatorio_cardapio_itens_indisponiveis() {
-   limpar_tela();
-    printf("╔══════════════════════════════════════════════════╗\n");
-    printf("║           ITEM INDISPONIVEIS NO CARDAPIO         ║\n");
-    printf("╚══════════════════════════════════════════════════╝\n");
+int strcasestr_custom(const char *haystack, const char *needle) {
+    if (!haystack || !needle) return 0;
 
-    Itemcardapio* item = (Itemcardapio*) malloc(sizeof(Itemcardapio));
-    FILE* arq_cardapio = fopen(ARQUIVO_ITEM,"rb");
-    if (arq_cardapio == NULL) {
-        printf("Erro ao abrir o arquivo de cardapio.\n");
-        limparBuffer();
-        return;
-    }
-    while (fread(item, sizeof(Itemcardapio), 1, arq_cardapio) == 1) {
-        if(item->disponivel == 1){
-        exibir_item(item);
-        }
-    }
-    fclose(arq_cardapio);
-    free(item);
-    pausar();
+    char h[200], n[200];
+    int i;
+
+    // copia e converte para minúsculas
+    for (i = 0; haystack[i] && i < 199; i++)
+        h[i] = tolower(haystack[i]);
+    h[i] = '\0';
+
+    for (i = 0; needle[i] && i < 199; i++)
+        n[i] = tolower(needle[i]);
+    n[i] = '\0';
+
+    // procura substring
+    return strstr(h, n) != NULL;
 }
 
 
 
 void procurar_item_por_categoria() {
 
-    char categoria_lida[15];
+    char categoria_lida[40];
     Itemcardapio* item = (Itemcardapio*) malloc(sizeof(Itemcardapio));
     limpar_tela();
     printf("╔══════════════════════════════════════════════════╗\n");
@@ -312,7 +322,8 @@ void procurar_item_por_categoria() {
     }
 
     while (fread(item, sizeof(Itemcardapio), 1, arq_cardapio) == 1) {
-        if (strstr(item->categoria, categoria_lida) != NULL) {
+
+        if (strcasestr_custom(item->categoria, categoria_lida)) {
             exibir_item(item);
         }
     }
@@ -591,6 +602,8 @@ void relatorio_estoque() {
 // RELATÓRIOS CLIENTES
 //////////////////////////////////////////////////////////////////////////////////////////
 
+
+
 void relatorio_clientes() {
     limpar_tela();
     printf("╔══════════════════════════════════════════════════╗\n");
@@ -675,9 +688,13 @@ void relatorio_clientes_com_ultimo_pedido() {
     pausar();
 }
 
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // RELATÓRIOS DOS PEDIDOS
 ///////////////////////////////////////////////////////////////////////////////
+
+
 
 void exibir_pedidos_por_status() {
     FILE *arq;
@@ -733,6 +750,8 @@ void exibir_pedidos_por_status() {
 
     pausar();
 }
+
+
 
 void relatorio_delivery_vs_local() {
     FILE *arq;
@@ -792,6 +811,8 @@ void relatorio_delivery_vs_local() {
 
     pausar();
 }
+
+
 
 void relatorio_itens_mais_pedidos() {
     FILE *arq;
@@ -873,6 +894,8 @@ void relatorio_itens_mais_pedidos() {
 
     pausar();
 }
+
+
 
 void relatorio_historico_cliente() {
     FILE *arq_ped, *arq_cli;
@@ -964,6 +987,8 @@ void relatorio_historico_cliente() {
     pausar();
 }
 
+
+
 void relatorio_pedidos_por_data() {
     FILE *arq;
     Pedido ped;
@@ -1023,6 +1048,8 @@ void relatorio_pedidos_por_data() {
     pausar();
 }
 
+
+
 void relatorio_pedidos() {
     limpar_tela();
     printf("╔══════════════════════════════════════════════════╗\n");
@@ -1039,6 +1066,7 @@ void relatorio_pedidos() {
     printf("╚══════════════════════════════════════════════════╝\n");
     printf("Escolha uma opção: ");
 }
+
 
 
 void relatorio() {
@@ -1135,6 +1163,39 @@ void relatorio() {
                             printf("Opção inválida! Tente novamente.\n");
                     }
                 } while (opcao_clientes != 0);
+                break;
+            case 4:
+                do {
+                    relatorio_pedidos();
+                    scanf("%d", &opcao);
+                    limparBuffer();
+
+                    switch (opcao) {
+                        case 1:
+                            listar_pedidos();
+                            break;
+                        case 2:
+                            exibir_pedidos_por_status();
+                            break;
+                        case 3:
+                            relatorio_delivery_vs_local();
+                            break;
+                        case 4:
+                            relatorio_itens_mais_pedidos();
+                            break;
+                        case 5:
+                            relatorio_historico_cliente();
+                            break;
+                        case 6:
+                            relatorio_pedidos_por_data();
+                            break;
+                        case 0:
+                            printf("Voltando ao Menu de Relatórios...\n");
+                            break;
+                        default:
+                            printf("Opção inválida! Tente novamente.\n");
+                    }
+                } while (opcao != 0);
                 break;
             case 0:
                 break;
