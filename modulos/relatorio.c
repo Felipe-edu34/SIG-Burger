@@ -8,11 +8,13 @@
 #include "cliente.h"
 #include "cardapio.h"
 #include "pedido.h"
+#include "financeiro.h"
 
 #define ARQUIVO_ITEM "dados/item_cardapio.dat"
 #define ARQUIVO_ESTOQUE "dados/estoque.dat"
 #define ARQUIVO_PEDIDOS "dados/pedidos.dat"
 #define ARQUIVO_CLIENTES "dados/clientes.dat"
+#define ARQUIVO_FINANCEIRO "dados/financeiro.dat"
 
 
 void menu_relatorio(){
@@ -1065,6 +1067,99 @@ void relatorio_pedidos() {
     printf("║                                                  ║\n");
     printf("╚══════════════════════════════════════════════════╝\n");
     printf("Escolha uma opção: ");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// RELATÓRIOS FINANCEIROS
+///////////////////////////////////////////////////////////////////////////////
+
+void relatorio_financeiro_menu() {
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║             RELATÓRIO FINANCEIRO                 ║\n");
+    printf("╠══════════════════════════════════════════════════╣\n");
+    printf("║                                                  ║\n");
+    printf("║ ► 1. Transações por Período                      ║\n");
+    printf("║ ► 2. Transações por Categoria                    ║\n");
+    printf("║ ► 3. Maiores Entradas                            ║\n");
+    printf("║ ► 4. Maiores Saídas                              ║\n");
+    printf("║ ► 5. Fluxo de Caixa Mensal                       ║\n");
+    printf("║ ► 6. Comparativo: Pedidos vs Transações          ║\n");
+    printf("║                                                  ║\n");
+    printf("╚══════════════════════════════════════════════════╝\n");
+    printf("Escolha uma opção: ");
+}
+
+void relatorio_transacoes_periodo() {
+    FILE *arq;
+    Transacao trans;
+    char data_inicio[11], data_fim[11];
+    float total_entradas = 0.0;
+    float total_saidas = 0.0;
+    int contador = 0;
+
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║         TRANSAÇÕES POR PERÍODO                   ║\n");
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+
+    printf("► Data Inicial (DD/MM/AAAA): ");
+    ler_string(data_inicio, sizeof(data_inicio));
+
+    printf("► Data Final (DD/MM/AAAA): ");
+    ler_string(data_fim, sizeof(data_fim));
+
+    arq = fopen(ARQUIVO_FINANCEIRO, "rb");
+    if (arq == NULL) {
+        printf("\nNenhuma transação cadastrada ainda.\n");
+        pausar();
+        return;
+    }
+
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║    TRANSAÇÕES DE %s ATÉ %s    ║\n", data_inicio, data_fim);
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+    printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+
+    while (fread(&trans, sizeof(Transacao), 1, arq) == 1) {
+        if (trans.ativo == 1 && 
+            strcmp(trans.data, data_inicio) >= 0 && 
+            strcmp(trans.data, data_fim) <= 0) {
+            
+            contador++;
+            printf("%d. %s\n", contador, trans.descricao);
+            printf("   Tipo: %s\n", trans.tipo);
+            printf("   Categoria: %s\n", trans.categoria);
+            printf("   Valor: R$ %.2f\n", trans.valor);
+            printf("   Data: %s\n", trans.data);
+            printf("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+
+            if (strcmp(trans.tipo, "ENTRADA") == 0 || strcmp(trans.tipo, "entrada") == 0) {
+                total_entradas += trans.valor;
+            } else {
+                total_saidas += trans.valor;
+            }
+        }
+    }
+
+    fclose(arq);
+
+    if (contador == 0) {
+        printf("Nenhuma transação encontrada neste período.\n");
+    } else {
+        printf("╔══════════════════════════════════════════════════╗\n");
+        printf("║                RESUMO DO PERÍODO                 ║\n");
+        printf("╠══════════════════════════════════════════════════╣\n");
+        printf("║ Total de Transações: %-28d║\n", contador);
+        printf("║ Total Entradas: R$ %-30.2f║\n", total_entradas);
+        printf("║ Total Saídas: R$ %-32.2f║\n", total_saidas);
+        printf("║ Saldo: R$ %-39.2f║\n", total_entradas - total_saidas);
+        printf("╚══════════════════════════════════════════════════╝\n");
+    }
+
+    pausar();
 }
 
 
