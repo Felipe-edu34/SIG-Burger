@@ -1162,6 +1162,92 @@ void relatorio_transacoes_periodo() {
     pausar();
 }
 
+void relatorio_transacoes_categoria() {
+    FILE *arq;
+    Transacao trans;
+    
+    typedef struct {
+        char nome[50];
+        float total_entrada;
+        float total_saida;
+        int quantidade;
+    } CategoriaRelatorio;
+    
+    CategoriaRelatorio categorias[50];
+    int total_categorias = 0;
+
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║         TRANSAÇÕES POR CATEGORIA                 ║\n");
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+
+    arq = fopen(ARQUIVO_FINANCEIRO, "rb");
+    if (arq == NULL) {
+        printf("Nenhuma transação cadastrada ainda.\n");
+        pausar();
+        return;
+    }
+
+    while (fread(&trans, sizeof(Transacao), 1, arq) == 1) {
+        if (trans.ativo == 1) {
+            int encontrado = 0;
+            
+            for (int i = 0; i < total_categorias; i++) {
+                if (strcmp(categorias[i].nome, trans.categoria) == 0) {
+                    categorias[i].quantidade++;
+                    if (strcmp(trans.tipo, "ENTRADA") == 0 || strcmp(trans.tipo, "entrada") == 0) {
+                        categorias[i].total_entrada += trans.valor;
+                    } else {
+                        categorias[i].total_saida += trans.valor;
+                    }
+                    encontrado = 1;
+                    break;
+                }
+            }
+            
+            if (!encontrado && total_categorias < 50) {
+                strcpy(categorias[total_categorias].nome, trans.categoria);
+                categorias[total_categorias].quantidade = 1;
+                if (strcmp(trans.tipo, "ENTRADA") == 0 || strcmp(trans.tipo, "entrada") == 0) {
+                    categorias[total_categorias].total_entrada = trans.valor;
+                    categorias[total_categorias].total_saida = 0.0;
+                } else {
+                    categorias[total_categorias].total_entrada = 0.0;
+                    categorias[total_categorias].total_saida = trans.valor;
+                }
+                total_categorias++;
+            }
+        }
+    }
+
+    fclose(arq);
+
+    if (total_categorias == 0) {
+        printf("Nenhuma categoria encontrada.\n");
+        pausar();
+        return;
+    }
+
+    printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+
+    for (int i = 0; i < total_categorias; i++) {
+        float saldo = categorias[i].total_entrada - categorias[i].total_saida;
+        
+        printf("Categoria: %s\n", categorias[i].nome);
+        printf("Quantidade de transações: %d\n", categorias[i].quantidade);
+        printf("Total Entradas: R$ %.2f\n", categorias[i].total_entrada);
+        printf("Total Saídas: R$ %.2f\n", categorias[i].total_saida);
+        printf("Saldo: R$ %.2f", saldo);
+        
+        if (saldo > 0) printf(" (Positivo)\n");
+        else if (saldo < 0) printf(" (Negativo)\n");
+        else printf(" (Neutro)\n");
+        
+        printf("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+    }
+
+    pausar();
+}
 
 
 void relatorio() {
