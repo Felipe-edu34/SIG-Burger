@@ -350,6 +350,8 @@ void relatorio_cardapio() {
     printf("║ ► 4. procurar item por categoria                 ║\n");
     printf("║ ► 5. exibir itens por preço                      ║\n");
     printf("║                                                  ║\n");
+    printf("║ ► 0. Voltar ao Menu Principal                    ║\n");
+    printf("║                                                  ║\n");
     printf("╚══════════════════════════════════════════════════╝\n");
     printf("Escolha uma opção: ");
     
@@ -593,6 +595,8 @@ void relatorio_estoque() {
     printf("║ ► 4. Procurar item por nome                      ║\n");
     printf("║ ► 5. Listar estoque por quantidade               ║\n");
     printf("║                                                  ║\n");
+    printf("║ ► 0. Voltar ao Menu de Relatórios                ║\n");
+    printf("║                                                  ║\n");
     printf("╚══════════════════════════════════════════════════╝\n");
     printf("Escolha uma opção: ");
 
@@ -612,11 +616,12 @@ void relatorio_clientes() {
     printf("║               RELATORIO CLIENTES                 ║\n");
     printf("╠══════════════════════════════════════════════════╣\n");
     printf("║                                                  ║\n");
-    printf("║ ► 1. Exibir todos os clientes                    ║\n");
-    printf("║ ► 2. Clientes com pedidos ativos                 ║\n");
-    printf("║ ► 3. Ultimo pedido por cliente                   ║\n");
-    printf("║ ► 4. Procurar cliente por nome                   ║\n");
-    printf("║ ► 5. Listar clientes por ordem alfabética        ║\n");
+    printf("║ ► 1. Clientes com pedidos ativos                 ║\n");
+    printf("║ ► 2. Ultimo pedido por cliente                   ║\n");
+    printf("║ ► 3. Procurar cliente por nome                   ║\n");
+    printf("║ ► 4. Listar clientes por ordem alfabética        ║\n");
+    printf("║                                                  ║\n");
+    printf("║ ► 0. Voltar ao Menu Principal                    ║\n");
     printf("║                                                  ║\n");
     printf("╚══════════════════════════════════════════════════╝\n");
     printf("Escolha uma opção: ");
@@ -1255,6 +1260,8 @@ void relatorio_pedidos() {
     printf("║ ► 5. Histórico de Cliente                        ║\n");
     printf("║ ► 6. Pedidos por Data                            ║\n");
     printf("║                                                  ║\n");
+    printf("║ ► 0. Voltar ao Menu de Relatórios                ║\n");
+    printf("║                                                  ║\n");
     printf("╚══════════════════════════════════════════════════╝\n");
     printf("Escolha uma opção: ");
 }
@@ -1276,6 +1283,8 @@ void relatorio_financeiro_menu() {
     printf("║ ► 4. Maiores Saídas                              ║\n");
     printf("║ ► 5. Fluxo de Caixa Mensal                       ║\n");
     printf("║ ► 6. Comparativo: Pedidos vs Transações          ║\n");
+    printf("║                                                  ║\n");
+    printf("║ ► 0. Voltar ao Menu Principal                    ║\n");
     printf("║                                                  ║\n");
     printf("╚══════════════════════════════════════════════════╝\n");
     printf("Escolha uma opção: ");
