@@ -938,6 +938,53 @@ NodePedido* montar_lista_pedidos_ordenada_valor() {
     return lista;
 }
 
+void listar_pedidos_por_valor() {
+    NodePedido *lista, *p;
+    int contador = 0;
+    float total_geral = 0.0;
+
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║       TODOS OS PEDIDOS (POR VALOR)               ║\n");
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+
+    lista = montar_lista_pedidos_ordenada_valor();
+
+    if (!lista) {
+        printf("Nenhum pedido cadastrado.\n");
+        pausar();
+        return;
+    }
+
+    printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+
+    p = lista;
+    while (p != NULL) {
+        contador++;
+        total_geral += p->dado.valor_total;
+
+        printf("Pedido #%d\n", p->dado.numero_pedido);
+        printf("Cliente: %s\n", p->dado.nome_cliente);
+        printf("Tipo: %s\n", p->dado.eh_delivery ? "DELIVERY" : "CONSUMO NO LOCAL");
+        printf("Data: %s\n", p->dado.data);
+        printf("Status: %s\n", p->dado.status);
+        printf("Valor: R$ %.2f\n", p->dado.valor_total);
+        printf("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+
+        p = p->prox;
+    }
+
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║                    RESUMO                        ║\n");
+    printf("╠══════════════════════════════════════════════════╣\n");
+    printf("║ Total de Pedidos: %-30d║\n", contador);
+    printf("║ Faturamento Total: R$ %-27.2f║\n", total_geral);
+    printf("╚══════════════════════════════════════════════════╝\n");
+
+    liberar_lista_pedidos(lista);
+    pausar();
+}
+
 void exibir_pedidos_por_status() {
     FILE *arq;
     Pedido ped;
