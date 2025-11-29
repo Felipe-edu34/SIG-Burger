@@ -614,14 +614,13 @@ void relatorio_clientes() {
     printf("║                                                  ║\n");
     printf("║ ► 1. Exibir todos os clientes                    ║\n");
     printf("║ ► 2. Clientes com pedidos ativos                 ║\n");
-    printf("║ ► 3. ultimo pedido por cliente                   ║\n");
+    printf("║ ► 3. Ultimo pedido por cliente                   ║\n");
     printf("║ ► 4. Procurar cliente por nome                   ║\n");
     printf("║ ► 5. Listar clientes por ordem alfabética        ║\n");
     printf("║                                                  ║\n");
     printf("╚══════════════════════════════════════════════════╝\n");
     printf("Escolha uma opção: ");
-
-} 
+}
 
 NodeCliente* montar_lista_clientes_ordenada() {
     FILE *fp = fopen(ARQUIVO_CLIENTES, "rb");
@@ -658,6 +657,15 @@ NodeCliente* montar_lista_clientes_ordenada() {
 
     fclose(fp);
     return lista;
+}
+
+void liberar_lista_clientes(NodeCliente *lista) {
+    NodeCliente *aux;
+    while (lista != NULL) {
+        aux = lista;
+        lista = lista->prox;
+        free(aux);
+    }
 }
 
 void relatorio_clientes_ordem_alfabetica() {
