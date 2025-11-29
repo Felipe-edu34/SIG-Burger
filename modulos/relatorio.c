@@ -1855,15 +1855,16 @@ void relatorio() {
 
                     switch (opcao_clientes) {
                         case 1:
+                            relatorio_clientes_com_pedidos_ativos();
                             break;
                         case 2:
-                            break;
-                        case 3:
                             relatorio_clientes_com_ultimo_pedido();
                             break;
-                        case 4:
+                        case 3:
+                            relatorio_procurar_cliente_por_nome();
                             break;
-                        case 5:
+                        case 4:
+                            relatorio_clientes_ordem_alfabetica();
                             break;
                         case 0:
                             break;
