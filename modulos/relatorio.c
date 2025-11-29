@@ -901,6 +901,43 @@ void liberar_lista_pedidos(NodePedido *lista) {
     }
 }
 
+NodePedido* montar_lista_pedidos_ordenada_valor() {
+    FILE *fp = fopen(ARQUIVO_PEDIDOS, "rb");
+    if (!fp) return NULL;
+
+    NodePedido *lista = NULL;
+    NodePedido *novo, *atual, *anter;
+    Pedido temp;
+
+    while (fread(&temp, sizeof(Pedido), 1, fp) == 1) {
+        if (temp.ativo == 0) continue;
+
+        novo = (NodePedido*) malloc(sizeof(NodePedido));
+        novo->dado = temp;
+        novo->prox = NULL;
+
+        // Insere ordenado por valor
+        if (lista == NULL || novo->dado.valor_total > lista->dado.valor_total) {
+            novo->prox = lista;
+            lista = novo;
+        } else {
+            anter = lista;
+            atual = lista->prox;
+
+            while (atual != NULL && novo->dado.valor_total < atual->dado.valor_total) {
+                anter = atual;
+                atual = atual->prox;
+            }
+
+            anter->prox = novo;
+            novo->prox = atual;
+        }
+    }
+
+    fclose(fp);
+    return lista;
+}
+
 void exibir_pedidos_por_status() {
     FILE *arq;
     Pedido ped;
