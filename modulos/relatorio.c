@@ -23,11 +23,11 @@ void menu_relatorio(){
         printf("║               MÓDULO DE RELATÓRIOS               ║\n");
         printf("╠══════════════════════════════════════════════════╣\n");
         printf("║                                                  ║\n");
-        printf("║ ► 1. Relatório de cardapio                       ║\n");
+        printf("║ ► 1. Relatório de Cardapio                       ║\n");
         printf("║ ► 2. Relatório de Estoque                        ║\n");
         printf("║ ► 3. Relatório de Clientes                       ║\n");
-        printf("║ ► 4. Relatório de pedidos                        ║\n");
-        printf("║ ► 5. Relatorio financeiro                        ║\n");
+        printf("║ ► 4. Relatório de Pedidos                        ║\n");
+        printf("║ ► 5. Relatório Financeiro                        ║\n");
         printf("║                                                  ║\n");
         printf("║ ► 0. Voltar ao Menu Principal                    ║\n");
         printf("║                                                  ║\n");
@@ -344,11 +344,11 @@ void relatorio_cardapio() {
     printf("║               RELATÓRIO D0 CARDÁPIO              ║\n");
     printf("╠══════════════════════════════════════════════════╣\n");
     printf("║                                                  ║\n");
-    printf("║ ► 1. exibir cardapio                             ║\n");
+    printf("║ ► 1. Exibir Cardapio                             ║\n");
     printf("║ ► 2. Itens disponíveis                           ║\n");
     printf("║ ► 3. Itens indisponíveis                         ║\n");
-    printf("║ ► 4. procurar item por categoria                 ║\n");
-    printf("║ ► 5. exibir itens por preço                      ║\n");
+    printf("║ ► 4. Procurar Item por Categoria                 ║\n");
+    printf("║ ► 5. Exibir Itens por Preço                      ║\n");
     printf("║                                                  ║\n");
     printf("║ ► 0. Voltar ao Menu Principal                    ║\n");
     printf("║                                                  ║\n");
@@ -589,11 +589,11 @@ void relatorio_estoque() {
     printf("║               RELATÓRIO DO ESTOQUE               ║\n");
     printf("╠══════════════════════════════════════════════════╣\n");
     printf("║                                                  ║\n");
-    printf("║ ► 1. Listar todo o estoque                       ║\n");
-    printf("║ ► 2. Itens com baixa quantidade                  ║\n");
+    printf("║ ► 1. Listar todo o Estoque                       ║\n");
+    printf("║ ► 2. Itens com baixa Quantidade                  ║\n");
     printf("║ ► 3. Itens indisponiveis                         ║\n");
-    printf("║ ► 4. Procurar item por nome                      ║\n");
-    printf("║ ► 5. Listar estoque por quantidade               ║\n");
+    printf("║ ► 4. Procurar item por Nome                      ║\n");
+    printf("║ ► 5. Listar Estoque por Quantidade               ║\n");
     printf("║                                                  ║\n");
     printf("║ ► 0. Voltar ao Menu de Relatórios                ║\n");
     printf("║                                                  ║\n");
@@ -616,10 +616,10 @@ void relatorio_clientes() {
     printf("║               RELATORIO CLIENTES                 ║\n");
     printf("╠══════════════════════════════════════════════════╣\n");
     printf("║                                                  ║\n");
-    printf("║ ► 1. Clientes com pedidos ativos                 ║\n");
-    printf("║ ► 2. Ultimo pedido por cliente                   ║\n");
-    printf("║ ► 3. Procurar cliente por nome                   ║\n");
-    printf("║ ► 4. Listar clientes por ordem alfabética        ║\n");
+    printf("║ ► 1. Clientes com Pedidos Ativos                 ║\n");
+    printf("║ ► 2. Ultimo Pedido por Cliente                   ║\n");
+    printf("║ ► 3. Procurar Cliente por Nome                   ║\n");
+    printf("║ ► 4. Listar Clientes por ordem alfabética        ║\n");
     printf("║                                                  ║\n");
     printf("║ ► 0. Voltar ao Menu Principal                    ║\n");
     printf("║                                                  ║\n");
@@ -1973,7 +1973,7 @@ void relatorio() {
 
                     switch (opcao) {
                         case 1:
-                            listar_pedidos();
+                            listar_pedidos_por_valor();
                             break;
                         case 2:
                             exibir_pedidos_por_status();
