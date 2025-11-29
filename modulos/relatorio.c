@@ -23,11 +23,11 @@ void menu_relatorio(){
         printf("║               MÓDULO DE RELATÓRIOS               ║\n");
         printf("╠══════════════════════════════════════════════════╣\n");
         printf("║                                                  ║\n");
-        printf("║ ► 1. Relatório de cardapio                       ║\n");
+        printf("║ ► 1. Relatório de Cardapio                       ║\n");
         printf("║ ► 2. Relatório de Estoque                        ║\n");
         printf("║ ► 3. Relatório de Clientes                       ║\n");
-        printf("║ ► 4. Relatório de pedidos                        ║\n");
-        printf("║ ► 5. Relatorio financeiro                        ║\n");
+        printf("║ ► 4. Relatório de Pedidos                        ║\n");
+        printf("║ ► 5. Relatório Financeiro                        ║\n");
         printf("║                                                  ║\n");
         printf("║ ► 0. Voltar ao Menu Principal                    ║\n");
         printf("║                                                  ║\n");
@@ -355,11 +355,11 @@ void relatorio_cardapio() {
     printf("║               RELATÓRIO D0 CARDÁPIO              ║\n");
     printf("╠══════════════════════════════════════════════════╣\n");
     printf("║                                                  ║\n");
-    printf("║ ► 1. exibir cardapio                             ║\n");
+    printf("║ ► 1. Exibir Cardapio                             ║\n");
     printf("║ ► 2. Itens disponíveis                           ║\n");
     printf("║ ► 3. Itens indisponíveis                         ║\n");
-    printf("║ ► 4. procurar item por categoria                 ║\n");
-    printf("║ ► 5. exibir itens por preço                      ║\n");
+    printf("║ ► 4. Procurar Item por Categoria                 ║\n");
+    printf("║ ► 5. Exibir Itens por Preço                      ║\n");
     printf("║                                                  ║\n");
     printf("║ ► 0. Voltar ao Menu Principal                    ║\n");
     printf("║                                                  ║\n");
@@ -600,11 +600,11 @@ void relatorio_estoque() {
     printf("║               RELATÓRIO DO ESTOQUE               ║\n");
     printf("╠══════════════════════════════════════════════════╣\n");
     printf("║                                                  ║\n");
-    printf("║ ► 1. Listar todo o estoque                       ║\n");
-    printf("║ ► 2. Itens com baixa quantidade                  ║\n");
+    printf("║ ► 1. Listar todo o Estoque                       ║\n");
+    printf("║ ► 2. Itens com baixa Quantidade                  ║\n");
     printf("║ ► 3. Itens indisponiveis                         ║\n");
-    printf("║ ► 4. Procurar item por nome                      ║\n");
-    printf("║ ► 5. Listar estoque por quantidade               ║\n");
+    printf("║ ► 4. Procurar item por Nome                      ║\n");
+    printf("║ ► 5. Listar Estoque por Quantidade               ║\n");
     printf("║                                                  ║\n");
     printf("║ ► 0. Voltar ao Menu de Relatórios                ║\n");
     printf("║                                                  ║\n");
@@ -627,10 +627,10 @@ void relatorio_clientes() {
     printf("║               RELATORIO CLIENTES                 ║\n");
     printf("╠══════════════════════════════════════════════════╣\n");
     printf("║                                                  ║\n");
-    printf("║ ► 1. Clientes com pedidos ativos                 ║\n");
-    printf("║ ► 2. Ultimo pedido por cliente                   ║\n");
-    printf("║ ► 3. Procurar cliente por nome                   ║\n");
-    printf("║ ► 4. Listar clientes por ordem alfabética        ║\n");
+    printf("║ ► 1. Clientes com Pedidos Ativos                 ║\n");
+    printf("║ ► 2. Ultimo Pedido por Cliente                   ║\n");
+    printf("║ ► 3. Procurar Cliente por Nome                   ║\n");
+    printf("║ ► 4. Listar Clientes por ordem alfabética        ║\n");
     printf("║                                                  ║\n");
     printf("║ ► 0. Voltar ao Menu Principal                    ║\n");
     printf("║                                                  ║\n");
@@ -903,6 +903,98 @@ void relatorio_clientes_com_ultimo_pedido() {
 ///////////////////////////////////////////////////////////////////////////////
 
 
+void liberar_lista_pedidos(NodePedido *lista) {
+    NodePedido *aux;
+    while (lista != NULL) {
+        aux = lista;
+        lista = lista->prox;
+        free(aux);
+    }
+}
+
+NodePedido* montar_lista_pedidos_ordenada_valor() {
+    FILE *fp = fopen(ARQUIVO_PEDIDOS, "rb");
+    if (!fp) return NULL;
+
+    NodePedido *lista = NULL;
+    NodePedido *novo, *atual, *anter;
+    Pedido temp;
+
+    while (fread(&temp, sizeof(Pedido), 1, fp) == 1) {
+        if (temp.ativo == 0) continue;
+
+        novo = (NodePedido*) malloc(sizeof(NodePedido));
+        novo->dado = temp;
+        novo->prox = NULL;
+
+        // Insere ordenado por valor
+        if (lista == NULL || novo->dado.valor_total > lista->dado.valor_total) {
+            novo->prox = lista;
+            lista = novo;
+        } else {
+            anter = lista;
+            atual = lista->prox;
+
+            while (atual != NULL && novo->dado.valor_total < atual->dado.valor_total) {
+                anter = atual;
+                atual = atual->prox;
+            }
+
+            anter->prox = novo;
+            novo->prox = atual;
+        }
+    }
+
+    fclose(fp);
+    return lista;
+}
+
+void listar_pedidos_por_valor() {
+    NodePedido *lista, *p;
+    int contador = 0;
+    float total_geral = 0.0;
+
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║       TODOS OS PEDIDOS (POR VALOR)               ║\n");
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+
+    lista = montar_lista_pedidos_ordenada_valor();
+
+    if (!lista) {
+        printf("Nenhum pedido cadastrado.\n");
+        pausar();
+        return;
+    }
+
+    printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+
+    p = lista;
+    while (p != NULL) {
+        contador++;
+        total_geral += p->dado.valor_total;
+
+        printf("Pedido #%d\n", p->dado.numero_pedido);
+        printf("Cliente: %s\n", p->dado.nome_cliente);
+        printf("Tipo: %s\n", p->dado.eh_delivery ? "DELIVERY" : "CONSUMO NO LOCAL");
+        printf("Data: %s\n", p->dado.data);
+        printf("Status: %s\n", p->dado.status);
+        printf("Valor: R$ %.2f\n", p->dado.valor_total);
+        printf("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+
+        p = p->prox;
+    }
+
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║                    RESUMO                        ║\n");
+    printf("╠══════════════════════════════════════════════════╣\n");
+    printf("║ Total de Pedidos: %-30d║\n", contador);
+    printf("║ Faturamento Total: R$ %-27.2f║\n", total_geral);
+    printf("╚══════════════════════════════════════════════════╝\n");
+
+    liberar_lista_pedidos(lista);
+    pausar();
+}
 
 void exibir_pedidos_por_status() {
     FILE *arq;
@@ -1892,7 +1984,7 @@ void relatorio() {
 
                     switch (opcao) {
                         case 1:
-                            listar_pedidos();
+                            listar_pedidos_por_valor();
                             break;
                         case 2:
                             exibir_pedidos_por_status();
