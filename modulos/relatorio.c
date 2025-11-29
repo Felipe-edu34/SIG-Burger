@@ -8,11 +8,13 @@
 #include "cliente.h"
 #include "cardapio.h"
 #include "pedido.h"
+#include "financeiro.h"
 
 #define ARQUIVO_ITEM "dados/item_cardapio.dat"
 #define ARQUIVO_ESTOQUE "dados/estoque.dat"
 #define ARQUIVO_PEDIDOS "dados/pedidos.dat"
 #define ARQUIVO_CLIENTES "dados/clientes.dat"
+#define ARQUIVO_FINANCEIRO "dados/financeiro.dat"
 
 
 void menu_relatorio(){
@@ -1079,9 +1081,516 @@ void relatorio_pedidos() {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// RELATÓRIOS FINANCEIROS
+///////////////////////////////////////////////////////////////////////////////
+
+void relatorio_financeiro_menu() {
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║             RELATÓRIO FINANCEIRO                 ║\n");
+    printf("╠══════════════════════════════════════════════════╣\n");
+    printf("║                                                  ║\n");
+    printf("║ ► 1. Transações por Período                      ║\n");
+    printf("║ ► 2. Transações por Categoria                    ║\n");
+    printf("║ ► 3. Maiores Entradas                            ║\n");
+    printf("║ ► 4. Maiores Saídas                              ║\n");
+    printf("║ ► 5. Fluxo de Caixa Mensal                       ║\n");
+    printf("║ ► 6. Comparativo: Pedidos vs Transações          ║\n");
+    printf("║                                                  ║\n");
+    printf("╚══════════════════════════════════════════════════╝\n");
+    printf("Escolha uma opção: ");
+}
+
+void relatorio_transacoes_periodo() {
+    FILE *arq;
+    Transacao trans;
+    char data_inicio[11], data_fim[11];
+    float total_entradas = 0.0;
+    float total_saidas = 0.0;
+    int contador = 0;
+
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║         TRANSAÇÕES POR PERÍODO                   ║\n");
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+
+    printf("► Data Inicial (DD/MM/AAAA): ");
+    ler_string(data_inicio, sizeof(data_inicio));
+
+    printf("► Data Final (DD/MM/AAAA): ");
+    ler_string(data_fim, sizeof(data_fim));
+
+    arq = fopen(ARQUIVO_FINANCEIRO, "rb");
+    if (arq == NULL) {
+        printf("\nNenhuma transação cadastrada ainda.\n");
+        pausar();
+        return;
+    }
+
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║    TRANSAÇÕES DE %s ATÉ %s    ║\n", data_inicio, data_fim);
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+    printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+
+    while (fread(&trans, sizeof(Transacao), 1, arq) == 1) {
+        if (trans.ativo == 1 && 
+            strcmp(trans.data, data_inicio) >= 0 && 
+            strcmp(trans.data, data_fim) <= 0) {
+            
+            contador++;
+            printf("%d. %s\n", contador, trans.descricao);
+            printf("   Tipo: %s\n", trans.tipo);
+            printf("   Categoria: %s\n", trans.categoria);
+            printf("   Valor: R$ %.2f\n", trans.valor);
+            printf("   Data: %s\n", trans.data);
+            printf("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+
+            if (strcmp(trans.tipo, "ENTRADA") == 0 || strcmp(trans.tipo, "entrada") == 0) {
+                total_entradas += trans.valor;
+            } else {
+                total_saidas += trans.valor;
+            }
+        }
+    }
+
+    fclose(arq);
+
+    if (contador == 0) {
+        printf("Nenhuma transação encontrada neste período.\n");
+    } else {
+        printf("╔══════════════════════════════════════════════════╗\n");
+        printf("║                RESUMO DO PERÍODO                 ║\n");
+        printf("╠══════════════════════════════════════════════════╣\n");
+        printf("║ Total de Transações: %-28d║\n", contador);
+        printf("║ Total Entradas: R$ %-30.2f║\n", total_entradas);
+        printf("║ Total Saídas: R$ %-32.2f║\n", total_saidas);
+        printf("║ Saldo: R$ %-39.2f║\n", total_entradas - total_saidas);
+        printf("╚══════════════════════════════════════════════════╝\n");
+    }
+
+    pausar();
+}
+
+void relatorio_transacoes_categoria() {
+    FILE *arq;
+    Transacao trans;
+    
+    typedef struct {
+        char nome[50];
+        float total_entrada;
+        float total_saida;
+        int quantidade;
+    } CategoriaRelatorio;
+    
+    CategoriaRelatorio categorias[50];
+    int total_categorias = 0;
+
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║         TRANSAÇÕES POR CATEGORIA                 ║\n");
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+
+    arq = fopen(ARQUIVO_FINANCEIRO, "rb");
+    if (arq == NULL) {
+        printf("Nenhuma transação cadastrada ainda.\n");
+        pausar();
+        return;
+    }
+
+    while (fread(&trans, sizeof(Transacao), 1, arq) == 1) {
+        if (trans.ativo == 1) {
+            int encontrado = 0;
+            
+            for (int i = 0; i < total_categorias; i++) {
+                if (strcmp(categorias[i].nome, trans.categoria) == 0) {
+                    categorias[i].quantidade++;
+                    if (strcmp(trans.tipo, "ENTRADA") == 0 || strcmp(trans.tipo, "entrada") == 0) {
+                        categorias[i].total_entrada += trans.valor;
+                    } else {
+                        categorias[i].total_saida += trans.valor;
+                    }
+                    encontrado = 1;
+                    break;
+                }
+            }
+            
+            if (!encontrado && total_categorias < 50) {
+                strcpy(categorias[total_categorias].nome, trans.categoria);
+                categorias[total_categorias].quantidade = 1;
+                if (strcmp(trans.tipo, "ENTRADA") == 0 || strcmp(trans.tipo, "entrada") == 0) {
+                    categorias[total_categorias].total_entrada = trans.valor;
+                    categorias[total_categorias].total_saida = 0.0;
+                } else {
+                    categorias[total_categorias].total_entrada = 0.0;
+                    categorias[total_categorias].total_saida = trans.valor;
+                }
+                total_categorias++;
+            }
+        }
+    }
+
+    fclose(arq);
+
+    if (total_categorias == 0) {
+        printf("Nenhuma categoria encontrada.\n");
+        pausar();
+        return;
+    }
+
+    printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+
+    for (int i = 0; i < total_categorias; i++) {
+        float saldo = categorias[i].total_entrada - categorias[i].total_saida;
+        
+        printf("Categoria: %s\n", categorias[i].nome);
+        printf("Quantidade de transações: %d\n", categorias[i].quantidade);
+        printf("Total Entradas: R$ %.2f\n", categorias[i].total_entrada);
+        printf("Total Saídas: R$ %.2f\n", categorias[i].total_saida);
+        printf("Saldo: R$ %.2f", saldo);
+        
+        if (saldo > 0) printf(" (Positivo)\n");
+        else if (saldo < 0) printf(" (Negativo)\n");
+        else printf(" (Neutro)\n");
+        
+        printf("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+    }
+
+    pausar();
+}
+
+NodeTransacao* montar_lista_entradas_ordenadas() {
+    FILE *fp = fopen(ARQUIVO_FINANCEIRO, "rb");
+    if (!fp) return NULL;
+
+    NodeTransacao *lista = NULL;
+    NodeTransacao *novo, *atual, *anter;
+    Transacao temp;
+
+    while (fread(&temp, sizeof(Transacao), 1, fp) == 1) {
+        if (temp.ativo == 0 || 
+            (strcmp(temp.tipo, "ENTRADA") != 0 && strcmp(temp.tipo, "entrada") != 0))
+            continue;
+
+        novo = (NodeTransacao*) malloc(sizeof(NodeTransacao));
+        novo->dado = temp;
+        novo->prox = NULL;
+
+        // Insere ordenado por valor (MAIOR para MENOR)
+        if (lista == NULL || novo->dado.valor > lista->dado.valor) {
+            novo->prox = lista;
+            lista = novo;
+        } else {
+            anter = lista;
+            atual = lista->prox;
+
+            while (atual != NULL && novo->dado.valor < atual->dado.valor) {
+                anter = atual;
+                atual = atual->prox;
+            }
+
+            anter->prox = novo;
+            novo->prox = atual;
+        }
+    }
+
+    fclose(fp);
+    return lista;
+}
+
+void liberar_lista_transacoes(NodeTransacao *lista) {
+    NodeTransacao *aux;
+
+    while (lista != NULL) {
+        aux = lista;
+        lista = lista->prox;
+        free(aux);
+    }
+}
+
+void relatorio_maiores_entradas() {
+    NodeTransacao *lista;
+    NodeTransacao *p;
+    int contador = 0;
+    float soma_top = 0.0;
+
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║            MAIORES ENTRADAS                      ║\n");
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+
+    lista = montar_lista_entradas_ordenadas();
+
+    if (!lista) {
+        printf("Nenhuma entrada encontrada.\n");
+        pausar();
+        return;
+    }
+
+    printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+
+    p = lista;
+    while (p != NULL && contador < 10) {
+        contador++;
+        printf("%d. %s\n", contador, p->dado.descricao);
+        printf("   Categoria: %s\n", p->dado.categoria);
+        printf("   Valor: R$ %.2f\n", p->dado.valor);
+        printf("   Data: %s\n", p->dado.data);
+        printf("\n");
+
+        soma_top += p->dado.valor;
+        p = p->prox;
+    }
+
+    printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+    printf("Top %d entradas somam: R$ %.2f\n", contador, soma_top);
+
+    liberar_lista_transacoes(lista);
+    pausar();
+}
+
+NodeTransacao* montar_lista_saidas_ordenadas() {
+    FILE *fp = fopen(ARQUIVO_FINANCEIRO, "rb");
+    if (!fp) return NULL;
+
+    NodeTransacao *lista = NULL;
+    NodeTransacao *novo, *atual, *anter;
+    Transacao temp;
+
+    while (fread(&temp, sizeof(Transacao), 1, fp) == 1) {
+        if (temp.ativo == 0 || 
+            (strcmp(temp.tipo, "SAIDA") != 0 && strcmp(temp.tipo, "saida") != 0))
+            continue;
+
+        novo = (NodeTransacao*) malloc(sizeof(NodeTransacao));
+        novo->dado = temp;
+        novo->prox = NULL;
+
+        // Insere ordenado por valor (MAIOR para MENOR)
+        if (lista == NULL || novo->dado.valor > lista->dado.valor) {
+            novo->prox = lista;
+            lista = novo;
+        } else {
+            anter = lista;
+            atual = lista->prox;
+
+            while (atual != NULL && novo->dado.valor < atual->dado.valor) {
+                anter = atual;
+                atual = atual->prox;
+            }
+
+            anter->prox = novo;
+            novo->prox = atual;
+        }
+    }
+
+    fclose(fp);
+    return lista;
+}
+
+void relatorio_maiores_saidas() {
+    NodeTransacao *lista;
+    NodeTransacao *p;
+    int contador = 0;
+    float soma_top = 0.0;
+
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║             MAIORES SAÍDAS                       ║\n");
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+
+    lista = montar_lista_saidas_ordenadas();
+
+    if (!lista) {
+        printf("Nenhuma saída encontrada.\n");
+        pausar();
+        return;
+    }
+
+    printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+
+    p = lista;
+    while (p != NULL && contador < 10) {
+        contador++;
+        printf("%d. %s\n", contador, p->dado.descricao);
+        printf("   Categoria: %s\n", p->dado.categoria);
+        printf("   Valor: R$ %.2f\n", p->dado.valor);
+        printf("   Data: %s\n", p->dado.data);
+        printf("\n");
+
+        soma_top += p->dado.valor;
+        p = p->prox;
+    }
+
+    printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+    printf("Top %d saídas somam: R$ %.2f\n", contador, soma_top);
+
+    liberar_lista_transacoes(lista);
+    pausar();
+}
+
+void relatorio_fluxo_caixa_mensal() {
+    FILE *arq;
+    Transacao trans;
+    char mes_ano[8];
+    float entradas_mes = 0.0;
+    float saidas_mes = 0.0;
+    int contador = 0;
+
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║          FLUXO DE CAIXA MENSAL                   ║\n");
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+
+    printf("► Mês/Ano (MM/AAAA): ");
+    ler_string(mes_ano, sizeof(mes_ano));
+
+    arq = fopen(ARQUIVO_FINANCEIRO, "rb");
+    if (arq == NULL) {
+        printf("\nNenhuma transação cadastrada ainda.\n");
+        pausar();
+        return;
+    }
+
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║       FLUXO DE CAIXA - %s                ║\n", mes_ano);
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+    printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+
+    while (fread(&trans, sizeof(Transacao), 1, arq) == 1) {
+        if (trans.ativo == 1) {
+            char data_mes[8];
+            strncpy(data_mes, trans.data + 3, 7);
+            data_mes[7] = '\0';
+
+            if (strcmp(data_mes, mes_ano) == 0) {
+                contador++;
+                printf("%d. [%s] %s\n", contador, trans.data, trans.descricao);
+                printf("   %s - %s: R$ %.2f\n", 
+                       trans.tipo, trans.categoria, trans.valor);
+                printf("\n");
+
+                if (strcmp(trans.tipo, "ENTRADA") == 0 || strcmp(trans.tipo, "entrada") == 0) {
+                    entradas_mes += trans.valor;
+                } else {
+                    saidas_mes += trans.valor;
+                }
+            }
+        }
+    }
+
+    fclose(arq);
+
+    if (contador == 0) {
+        printf("Nenhuma transação encontrada neste mês.\n");
+    } else {
+        float saldo_mes = entradas_mes - saidas_mes;
+
+        printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+        printf("╔══════════════════════════════════════════════════╗\n");
+        printf("║              RESUMO DO MÊS                       ║\n");
+        printf("╠══════════════════════════════════════════════════╣\n");
+        printf("║ Transações: %-37d║\n", contador);
+        printf("║ Entradas: R$ %-36.2f║\n", entradas_mes);
+        printf("║ Saídas: R$ %-38.2f║\n", saidas_mes);
+        printf("║ ------------------------------------------------ ║\n");
+        printf("║ Saldo do Mês: R$ %-32.2f║\n", saldo_mes);
+        printf("╚══════════════════════════════════════════════════╝\n");
+
+        if (saldo_mes > 0) {
+            printf("\n✓ Mês positivo (Lucro)\n");
+        } else if (saldo_mes < 0) {
+            printf("\n✗ Mês negativo (Prejuízo)\n");
+        } else {
+            printf("\n= Mês equilibrado\n");
+        }
+    }
+
+    pausar();
+}
+
+void relatorio_comparativo_pedidos_transacoes() {
+    FILE *arq_ped, *arq_fin;
+    Pedido ped;
+    Transacao trans;
+    float total_pedidos = 0.0;
+    float total_entradas = 0.0;
+    int qtd_pedidos = 0;
+    int qtd_entradas = 0;
+
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║      COMPARATIVO: PEDIDOS VS TRANSAÇÕES          ║\n");
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+
+    arq_ped = fopen(ARQUIVO_PEDIDOS, "rb");
+    if (arq_ped != NULL) {
+        while (fread(&ped, sizeof(Pedido), 1, arq_ped) == 1) {
+            if (ped.ativo == 1) {
+                total_pedidos += ped.valor_total;
+                qtd_pedidos++;
+            }
+        }
+        fclose(arq_ped);
+    }
+
+    arq_fin = fopen(ARQUIVO_FINANCEIRO, "rb");
+    if (arq_fin != NULL) {
+        while (fread(&trans, sizeof(Transacao), 1, arq_fin) == 1) {
+            if (trans.ativo == 1 && 
+                (strcmp(trans.tipo, "ENTRADA") == 0 || strcmp(trans.tipo, "entrada") == 0)) {
+                total_entradas += trans.valor;
+                qtd_entradas++;
+            }
+        }
+        fclose(arq_fin);
+    }
+
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║                 PEDIDOS                          ║\n");
+    printf("╠══════════════════════════════════════════════════╣\n");
+    printf("║ Quantidade: %-37d║\n", qtd_pedidos);
+    printf("║ Valor Total: R$ %-33.2f║\n", total_pedidos);
+    if (qtd_pedidos > 0) {
+        printf("║ Ticket Médio: R$ %-32.2f║\n", total_pedidos / qtd_pedidos);
+    }
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║            TRANSAÇÕES (ENTRADAS)                 ║\n");
+    printf("╠══════════════════════════════════════════════════╣\n");
+    printf("║ Quantidade: %-37d║\n", qtd_entradas);
+    printf("║ Valor Total: R$ %-33.2f║\n", total_entradas);
+    if (qtd_entradas > 0) {
+        printf("║ Média: R$ %-39.2f║\n", total_entradas / qtd_entradas);
+    }
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+
+    float diferenca = total_pedidos - total_entradas;
+
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║                  ANÁLISE                         ║\n");
+    printf("╠══════════════════════════════════════════════════╣\n");
+    printf("║ Diferença: R$ %-35.2f║\n", diferenca);
+
+    if (diferenca > 0) {
+        printf("║ Status: Pedidos > Entradas (verificar lançamentos) ║\n");
+    } else if (diferenca < 0) {
+        printf("║ Status: Entradas > Pedidos (verificar origem)      ║\n");
+    } else {
+        printf("║ Status: Valores coincidem                          ║\n");
+    }
+
+    printf("╚══════════════════════════════════════════════════╝\n");
+
+    pausar();
+}
+
 
 void relatorio() {
-    int opcao, opcao_estoque, opcao_cardapio, opcao_clientes;
+    int opcao, opcao_estoque, opcao_cardapio, opcao_clientes, opcao_financeiro;
     
 
     do {
@@ -1207,6 +1716,47 @@ void relatorio() {
                             printf("Opção inválida! Tente novamente.\n");
                     }
                 } while (opcao != 0);
+                break;
+            case 5:
+                do {
+                    relatorio_financeiro_menu();
+                    scanf("%d", &opcao_financeiro);
+                    limparBuffer();
+
+                    switch (opcao_financeiro) {
+                        case 1:
+                            relatorio_transacoes_periodo();
+                            break;
+
+                        case 2:
+                            relatorio_transacoes_categoria();
+                            break;
+
+                        case 3:
+                            relatorio_maiores_entradas();
+                            break;
+
+                        case 4:
+                            relatorio_maiores_saidas();
+                            break;
+
+                        case 5:
+                            relatorio_fluxo_caixa_mensal();
+                            break;
+
+                        case 6:
+                            relatorio_comparativo_pedidos_transacoes();
+                            break;
+
+                        case 0:
+                            printf("Voltando ao Menu de Relatórios...\n");
+                            break;
+
+                        default:
+                            printf("Opção inválida! Tente novamente.\n");
+                    }
+
+                } while (opcao_financeiro != 0);
                 break;
             case 0:
                 break;
