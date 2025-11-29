@@ -892,6 +892,14 @@ void relatorio_clientes_com_ultimo_pedido() {
 ///////////////////////////////////////////////////////////////////////////////
 
 
+void liberar_lista_pedidos(NodePedido *lista) {
+    NodePedido *aux;
+    while (lista != NULL) {
+        aux = lista;
+        lista = lista->prox;
+        free(aux);
+    }
+}
 
 void exibir_pedidos_por_status() {
     FILE *arq;
