@@ -361,6 +361,8 @@ void relatorio_cardapio() {
     printf("║ ► 4. procurar item por categoria                 ║\n");
     printf("║ ► 5. exibir itens por preço                      ║\n");
     printf("║                                                  ║\n");
+    printf("║ ► 0. Voltar ao Menu Principal                    ║\n");
+    printf("║                                                  ║\n");
     printf("╚══════════════════════════════════════════════════╝\n");
     printf("Escolha uma opção: ");
     
@@ -604,6 +606,8 @@ void relatorio_estoque() {
     printf("║ ► 4. Procurar item por nome                      ║\n");
     printf("║ ► 5. Listar estoque por quantidade               ║\n");
     printf("║                                                  ║\n");
+    printf("║ ► 0. Voltar ao Menu de Relatórios                ║\n");
+    printf("║                                                  ║\n");
     printf("╚══════════════════════════════════════════════════╝\n");
     printf("Escolha uma opção: ");
 
@@ -623,18 +627,209 @@ void relatorio_clientes() {
     printf("║               RELATORIO CLIENTES                 ║\n");
     printf("╠══════════════════════════════════════════════════╣\n");
     printf("║                                                  ║\n");
-    printf("║ ► 1. Exibir todos os clientes                    ║\n");
-    printf("║ ► 2. Clientes com pedidos ativos                 ║\n");
-    printf("║ ► 3. ultimo pedido por cliente                   ║\n");
-    printf("║ ► 4. Procurar cliente por nome                   ║\n");
-    printf("║ ► 5. Listar clientes por ordem alfabética        ║\n");
+    printf("║ ► 1. Clientes com pedidos ativos                 ║\n");
+    printf("║ ► 2. Ultimo pedido por cliente                   ║\n");
+    printf("║ ► 3. Procurar cliente por nome                   ║\n");
+    printf("║ ► 4. Listar clientes por ordem alfabética        ║\n");
+    printf("║                                                  ║\n");
+    printf("║ ► 0. Voltar ao Menu Principal                    ║\n");
     printf("║                                                  ║\n");
     printf("╚══════════════════════════════════════════════════╝\n");
     printf("Escolha uma opção: ");
+}
 
-} 
+NodeCliente* montar_lista_clientes_ordenada() {
+    FILE *fp = fopen(ARQUIVO_CLIENTES, "rb");
+    if (!fp) return NULL;
 
+    NodeCliente *lista = NULL;
+    NodeCliente *novo, *atual, *anter;
+    Cliente temp;
 
+    while (fread(&temp, sizeof(Cliente), 1, fp) == 1) {
+        if (temp.status == 0) continue;
+
+        novo = (NodeCliente*) malloc(sizeof(NodeCliente));
+        novo->dado = temp;
+        novo->prox = NULL;
+
+        // ordenado por nome
+        if (lista == NULL || strcmp(novo->dado.nome, lista->dado.nome) < 0) {
+            novo->prox = lista;
+            lista = novo;
+        } else {
+            anter = lista;
+            atual = lista->prox;
+
+            while (atual != NULL && strcmp(novo->dado.nome, atual->dado.nome) > 0) {
+                anter = atual;
+                atual = atual->prox;
+            }
+
+            anter->prox = novo;
+            novo->prox = atual;
+        }
+    }
+
+    fclose(fp);
+    return lista;
+}
+
+void liberar_lista_clientes(NodeCliente *lista) {
+    NodeCliente *aux;
+    while (lista != NULL) {
+        aux = lista;
+        lista = lista->prox;
+        free(aux);
+    }
+}
+
+void relatorio_clientes_ordem_alfabetica() {
+    NodeCliente *lista, *p;
+    int contador = 0;
+
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║       CLIENTES EM ORDEM ALFABÉTICA              ║\n");
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+
+    lista = montar_lista_clientes_ordenada();
+
+    if (!lista) {
+        printf("Nenhum cliente cadastrado.\n");
+        pausar();
+        return;
+    }
+
+    printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+
+    p = lista;
+    while (p != NULL) {
+        contador++;
+        printf("%d. %s\n", contador, p->dado.nome);
+        printf("   CPF: %s\n", p->dado.cpf);
+        printf("   Telefone: %s\n", p->dado.telefone);
+        printf("   Endereço: %s\n", p->dado.endereco);
+        printf("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+
+        p = p->prox;
+    }
+
+    printf("Total de clientes: %d\n", contador);
+
+    liberar_lista_clientes(lista);
+    pausar();
+}
+
+void relatorio_procurar_cliente_por_nome() {
+    FILE *arq;
+    Cliente cli;
+    char nome_busca[50];
+    int encontrados = 0;
+
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║         PROCURAR CLIENTE POR NOME                ║\n");
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+
+    printf("► Nome (ou parte do nome): ");
+    ler_string(nome_busca, sizeof(nome_busca));
+
+    arq = fopen(ARQUIVO_CLIENTES, "rb");
+    if (arq == NULL) {
+        printf("\nNenhum cliente cadastrado.\n");
+        pausar();
+        return;
+    }
+
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║    RESULTADOS PARA: %-28s║\n", nome_busca);
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+    printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+
+    while (fread(&cli, sizeof(Cliente), 1, arq) == 1) {
+        if (cli.status == 1 && strcasestr_custom(cli.nome, nome_busca)) {
+            encontrados++;
+            printf("Cliente: %s\n", cli.nome);
+            printf("CPF: %s\n", cli.cpf);
+            printf("Telefone: %s\n", cli.telefone);
+            printf("Endereço: %s\n", cli.endereco);
+            printf("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+        }
+    }
+
+    fclose(arq);
+
+    if (encontrados == 0) {
+        printf("Nenhum cliente encontrado com esse nome.\n");
+    } else {
+        printf("Total encontrado: %d cliente(s)\n", encontrados);
+    }
+
+    pausar();
+}
+
+void relatorio_clientes_com_pedidos_ativos() {
+    FILE *arq_cli, *arq_ped;
+    Cliente cli;
+    Pedido ped;
+    int total_clientes_com_pedidos = 0;
+
+    limpar_tela();
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║        CLIENTES COM PEDIDOS ATIVOS               ║\n");
+    printf("╚══════════════════════════════════════════════════╝\n\n");
+
+    arq_cli = fopen(ARQUIVO_CLIENTES, "rb");
+    if (arq_cli == NULL) {
+        printf("Nenhum cliente cadastrado.\n");
+        pausar();
+        return;
+    }
+
+    printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+
+    while (fread(&cli, sizeof(Cliente), 1, arq_cli) == 1) {
+        if (cli.status == 0) continue;
+
+        int tem_pedido_ativo = 0;
+        int total_pedidos = 0;
+        float valor_total = 0.0;
+
+        arq_ped = fopen(ARQUIVO_PEDIDOS, "rb");
+        if (arq_ped != NULL) {
+            while (fread(&ped, sizeof(Pedido), 1, arq_ped) == 1) {
+                if (ped.ativo == 1 && strcmp(ped.telefone_cliente, cli.telefone) == 0) {
+                    tem_pedido_ativo = 1;
+                    total_pedidos++;
+                    valor_total += ped.valor_total;
+                }
+            }
+            fclose(arq_ped);
+        }
+
+        if (tem_pedido_ativo) {
+            total_clientes_com_pedidos++;
+            printf("Cliente: %s\n", cli.nome);
+            printf("CPF: %s\n", cli.cpf);
+            printf("Telefone: %s\n", cli.telefone);
+            printf("Pedidos Ativos: %d\n", total_pedidos);
+            printf("Valor Total: R$ %.2f\n", valor_total);
+            printf("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+        }
+    }
+
+    fclose(arq_cli);
+
+    if (total_clientes_com_pedidos == 0) {
+        printf("Nenhum cliente com pedidos ativos.\n");
+    } else {
+        printf("Total: %d cliente(s) com pedidos ativos\n", total_clientes_com_pedidos);
+    }
+
+    pausar();
+}
 
 void relatorio_clientes_com_ultimo_pedido() {
     FILE *arq_cli, *arq_ped;
@@ -1076,6 +1271,8 @@ void relatorio_pedidos() {
     printf("║ ► 5. Histórico de Cliente                        ║\n");
     printf("║ ► 6. Pedidos por Data                            ║\n");
     printf("║                                                  ║\n");
+    printf("║ ► 0. Voltar ao Menu de Relatórios                ║\n");
+    printf("║                                                  ║\n");
     printf("╚══════════════════════════════════════════════════╝\n");
     printf("Escolha uma opção: ");
 }
@@ -1097,6 +1294,8 @@ void relatorio_financeiro_menu() {
     printf("║ ► 4. Maiores Saídas                              ║\n");
     printf("║ ► 5. Fluxo de Caixa Mensal                       ║\n");
     printf("║ ► 6. Comparativo: Pedidos vs Transações          ║\n");
+    printf("║                                                  ║\n");
+    printf("║ ► 0. Voltar ao Menu Principal                    ║\n");
     printf("║                                                  ║\n");
     printf("╚══════════════════════════════════════════════════╝\n");
     printf("Escolha uma opção: ");
@@ -1667,15 +1866,16 @@ void relatorio() {
 
                     switch (opcao_clientes) {
                         case 1:
+                            relatorio_clientes_com_pedidos_ativos();
                             break;
                         case 2:
-                            break;
-                        case 3:
                             relatorio_clientes_com_ultimo_pedido();
                             break;
-                        case 4:
+                        case 3:
+                            relatorio_procurar_cliente_por_nome();
                             break;
-                        case 5:
+                        case 4:
+                            relatorio_clientes_ordem_alfabetica();
                             break;
                         case 0:
                             break;
