@@ -623,7 +623,42 @@ void relatorio_clientes() {
 
 } 
 
+NodeCliente* montar_lista_clientes_ordenada() {
+    FILE *fp = fopen(ARQUIVO_CLIENTES, "rb");
+    if (!fp) return NULL;
 
+    NodeCliente *lista = NULL;
+    NodeCliente *novo, *atual, *anter;
+    Cliente temp;
+
+    while (fread(&temp, sizeof(Cliente), 1, fp) == 1) {
+        if (temp.status == 0) continue;
+
+        novo = (NodeCliente*) malloc(sizeof(NodeCliente));
+        novo->dado = temp;
+        novo->prox = NULL;
+
+        // ordenado por nome
+        if (lista == NULL || strcmp(novo->dado.nome, lista->dado.nome) < 0) {
+            novo->prox = lista;
+            lista = novo;
+        } else {
+            anter = lista;
+            atual = lista->prox;
+
+            while (atual != NULL && strcmp(novo->dado.nome, atual->dado.nome) > 0) {
+                anter = atual;
+                atual = atual->prox;
+            }
+
+            anter->prox = novo;
+            novo->prox = atual;
+        }
+    }
+
+    fclose(fp);
+    return lista;
+}
 
 void relatorio_clientes_com_ultimo_pedido() {
     FILE *arq_cli, *arq_ped;
