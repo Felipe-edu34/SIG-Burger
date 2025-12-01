@@ -26,9 +26,86 @@ void menu_clientes(void) {
 
 
 
+void exibir_cliente(Cliente* cli) {
+    printf("╔══════════════════════════════════════════════════╗\n");
+    printf("║                DADOS DO CLIENTE                  ║\n");
+    printf("╠══════════════════════════════════════════════════╣\n");
+    printf("║ CPF:       %s\n", cli->cpf);
+    printf("║ Nome:      %s\n", cli->nome);
+    printf("║ Telefone:  %s\n", cli->telefone);
+    printf("║ Endereço:  %s\n", cli->endereco);
+    printf("╚══════════════════════════════════════════════════╝\n");
+}
+
+
+
+int confirma_dados_cliente(Cliente* cli) {
+    char confirm;
+    limpar_tela();
+    exibir_cliente(cli);
+    printf("Os dados do cliente estão corretos? (S/N): ");
+    scanf(" %c", &confirm);
+    limparBuffer();
+
+    if (confirm == 'S' || confirm == 's') {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+
+
+void gravar_cliente(Cliente* cli) {
+
+    FILE* arq = fopen(ARQUIVO_CLIENTES, "ab");
+    if (arq == NULL) {
+        printf("Erro ao abrir arquivo de clientes!\n");
+        return;
+    }
+    fwrite(cli, sizeof(Cliente), 1, arq);
+    fclose(arq);
+}
+
+
+
+
+int cpf_existente(char *cpf) {
+    Cliente* cli;
+    FILE *arq_clientes;
+    cli = (Cliente*) malloc(sizeof(Cliente));
+    if (cli == NULL) {
+        printf("Erro ao alocar memoria para o cliente.\n");
+        return 0;
+    }
+
+    arq_clientes = fopen(ARQUIVO_CLIENTES, "rb");
+    if (arq_clientes == NULL) {
+        free(cli);
+        return 1;            // arquivo vazio, CPF pode ser cadastrado
+    }
+
+    while (fread(cli, sizeof(Cliente), 1, arq_clientes) == 1) {        // Percorre o arquivo de clientes
+        if ((strcmp(cli->cpf, cpf) == 0) && (cli->status == 1)) {   // Compara o CPF lido com o CPF do cliente atual
+            printf("======================================================\n");
+            printf("CPF já cadastrado. Por favor, insira um CPF diferente.\n");
+            printf("operação cancelada.\n");
+            printf("======================================================\n");  
+            fclose(arq_clientes);
+            free(cli);
+            return 0;
+        }
+    } 
+
+    fclose(arq_clientes);
+    free(cli);
+    return 1;
+}
+  
+
+
 void cadastrar_cliente(void) {
     Cliente* cli = (Cliente*) malloc(sizeof(Cliente));
-    FILE* arq_cliente;
     
     limpar_tela();
     printf("\n");
@@ -37,21 +114,23 @@ void cadastrar_cliente(void) {
     printf("        ╚══════════════════════════════════════════════════╝\n\n");
     
     ler_cpf_cliente(cli->cpf);
+    if (!cpf_existente(cli->cpf)) {
+        free(cli);
+        pausar();
+        return;
+    }
     ler_nome_cliente(cli->nome);
     ler_telefone_cliente(cli->telefone);
     ler_endereco_entrega(cli->endereco);
     cli->status = 1;
     
-    arq_cliente = fopen(ARQUIVO_CLIENTES, "ab");
-    if (arq_cliente == NULL) {
-        printf("\n Erro ao abrir arquivo!\n");
-        pausar();
+    if (!confirma_dados_cliente(cli)) {
+        printf("\n        Cadastro cancelado pelo usuário.\n");
         free(cli);
+        pausar();
         return;
     }
-    
-    fwrite(cli, sizeof(Cliente), 1, arq_cliente);  
-    fclose(arq_cliente);
+    gravar_cliente(cli);
     free(cli);
     
     printf("\n Cliente cadastrado com sucesso!\n");
@@ -181,6 +260,13 @@ void editar_cliente(void) {
     ler_nome_cliente(cli.nome);
     ler_telefone_cliente(cli.telefone);
     ler_endereco_cliente(cli.endereco);
+
+    if (!confirma_dados_cliente(&cli)) {
+        printf("\n        Edição cancelada pelo usuário.\n");
+        fclose(fp);
+        pausar();
+        return;
+    }
     
     fseek(fp, pos_arquivo, SEEK_SET);
     fwrite(&cli, sizeof(Cliente), 1, fp);
