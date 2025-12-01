@@ -10,13 +10,18 @@ typedef struct {
     int ativo;
 } Transacao;
 
+typedef struct NodeTransacao {
+    Transacao dado;
+    struct NodeTransacao* prox;
+} NodeTransacao;
+
+
 void menu_financeiro();
 void financeiro();
 void cadastrar_transacao();
 void listar_transacoes();
 void editar_transacao();
 void excluir_transacao();
-void relatorio_financeiro();
 void exibir_transacao(Transacao* trans);
 int confirma_dados_transacao(Transacao* trans);
 void gravar_transacao(Transacao* trans);
