@@ -104,7 +104,6 @@ int cpf_existente(char *cpf) {
   
 
 
-
 void cadastrar_cliente(void) {
     Cliente* cli = (Cliente*) malloc(sizeof(Cliente));
     FILE* arq_cliente;
@@ -116,6 +115,11 @@ void cadastrar_cliente(void) {
     printf("        ╚══════════════════════════════════════════════════╝\n\n");
     
     ler_cpf_cliente(cli->cpf);
+    if (!cpf_existente(cli->cpf)) {
+        free(cli);
+        pausar();
+        return;
+    }
     ler_nome_cliente(cli->nome);
     ler_telefone_cliente(cli->telefone);
     ler_endereco_entrega(cli->endereco);
