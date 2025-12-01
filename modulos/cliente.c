@@ -106,7 +106,6 @@ int cpf_existente(char *cpf) {
 
 void cadastrar_cliente(void) {
     Cliente* cli = (Cliente*) malloc(sizeof(Cliente));
-    FILE* arq_cliente;
     
     limpar_tela();
     printf("\n");
