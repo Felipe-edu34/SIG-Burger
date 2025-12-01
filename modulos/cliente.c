@@ -57,7 +57,7 @@ int confirma_dados_cliente(Cliente* cli) {
 
 
 void gravar_cliente(Cliente* cli) {
-    
+
     FILE* arq = fopen(ARQUIVO_CLIENTES, "ab");
     if (arq == NULL) {
         printf("Erro ao abrir arquivo de clientes!\n");
@@ -66,6 +66,7 @@ void gravar_cliente(Cliente* cli) {
     fwrite(cli, sizeof(Cliente), 1, arq);
     fclose(arq);
 }
+
 
 
 void cadastrar_cliente(void) {
@@ -84,16 +85,13 @@ void cadastrar_cliente(void) {
     ler_endereco_entrega(cli->endereco);
     cli->status = 1;
     
-    arq_cliente = fopen(ARQUIVO_CLIENTES, "ab");
-    if (arq_cliente == NULL) {
-        printf("\n Erro ao abrir arquivo!\n");
-        pausar();
+    if (!confirma_dados_cliente(cli)) {
+        printf("\n        Cadastro cancelado pelo usuário.\n");
         free(cli);
+        pausar();
         return;
     }
-    
-    fwrite(cli, sizeof(Cliente), 1, arq_cliente);  
-    fclose(arq_cliente);
+    gravar_cliente(cli);
     free(cli);
     
     printf("\n Cliente cadastrado com sucesso!\n");
