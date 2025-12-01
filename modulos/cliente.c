@@ -69,6 +69,42 @@ void gravar_cliente(Cliente* cli) {
 
 
 
+
+int cpf_existente(char *cpf) {
+    Cliente* cli;
+    FILE *arq_clientes;
+    cli = (Cliente*) malloc(sizeof(Cliente));
+    if (cli == NULL) {
+        printf("Erro ao alocar memoria para o cliente.\n");
+        return 0;
+    }
+
+    arq_clientes = fopen("clientes.dat", "rb");
+    if (arq_clientes == NULL) {
+        free(cli);
+        return 0;            // arquivo vazio, CPF pode ser cadastrado
+    }
+
+    while (fread(cli, sizeof(Cliente), 1, arq_clientes) == 1) {        // Percorre o arquivo de clientes
+        if ((strcmp(cli->cpf, cpf) == 0) && (cli->status == 1)) {   // Compara o CPF lido com o CPF do cliente atual
+            printf("======================================================\n");
+            printf("CPF já cadastrado. Por favor, insira um CPF diferente.\n");
+            printf("operação cancelada.\n");
+            printf("======================================================\n");  
+            fclose(arq_clientes);
+            free(cli);
+            return 0;
+        }
+    } 
+
+    fclose(arq_clientes);
+    free(cli);
+    return 1;
+}
+  
+
+
+
 void cadastrar_cliente(void) {
     Cliente* cli = (Cliente*) malloc(sizeof(Cliente));
     FILE* arq_cliente;
