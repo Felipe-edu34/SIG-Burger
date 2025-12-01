@@ -637,6 +637,8 @@ void relatorio_clientes() {
     printf("Escolha uma opção: ");
 }
 
+
+
 NodeCliente* montar_lista_clientes_ordenada() {
     FILE *fp = fopen(ARQUIVO_CLIENTES, "rb");
     if (!fp) return NULL;
@@ -674,6 +676,8 @@ NodeCliente* montar_lista_clientes_ordenada() {
     return lista;
 }
 
+
+
 void liberar_lista_clientes(NodeCliente *lista) {
     NodeCliente *aux;
     while (lista != NULL) {
@@ -682,6 +686,8 @@ void liberar_lista_clientes(NodeCliente *lista) {
         free(aux);
     }
 }
+
+
 
 void relatorio_clientes_ordem_alfabetica() {
     NodeCliente *lista, *p;
@@ -719,6 +725,8 @@ void relatorio_clientes_ordem_alfabetica() {
     liberar_lista_clientes(lista);
     pausar();
 }
+
+
 
 void relatorio_procurar_cliente_por_nome() {
     FILE *arq;
@@ -768,6 +776,8 @@ void relatorio_procurar_cliente_por_nome() {
 
     pausar();
 }
+
+
 
 void relatorio_clientes_com_pedidos_ativos() {
     FILE *arq_cli, *arq_ped;
@@ -829,6 +839,8 @@ void relatorio_clientes_com_pedidos_ativos() {
 
     pausar();
 }
+
+
 
 void relatorio_clientes_com_ultimo_pedido() {
     FILE *arq_cli, *arq_ped;
@@ -911,6 +923,8 @@ void liberar_lista_pedidos(NodePedido *lista) {
     }
 }
 
+
+
 NodePedido* montar_lista_pedidos_ordenada_valor() {
     FILE *fp = fopen(ARQUIVO_PEDIDOS, "rb");
     if (!fp) return NULL;
@@ -947,6 +961,8 @@ NodePedido* montar_lista_pedidos_ordenada_valor() {
     fclose(fp);
     return lista;
 }
+
+
 
 void listar_pedidos_por_valor() {
     NodePedido *lista, *p;
@@ -994,6 +1010,8 @@ void listar_pedidos_por_valor() {
     liberar_lista_pedidos(lista);
     pausar();
 }
+
+
 
 void exibir_pedidos_por_status() {
     FILE *arq;
@@ -1392,6 +1410,8 @@ void relatorio_financeiro_menu() {
     printf("Escolha uma opção: ");
 }
 
+
+
 void relatorio_transacoes_periodo() {
     FILE *arq;
     Transacao trans;
@@ -1462,6 +1482,8 @@ void relatorio_transacoes_periodo() {
 
     pausar();
 }
+
+
 
 void relatorio_transacoes_categoria() {
     FILE *arq;
@@ -1550,6 +1572,8 @@ void relatorio_transacoes_categoria() {
     pausar();
 }
 
+
+
 NodeTransacao* montar_lista_entradas_ordenadas() {
     FILE *fp = fopen(ARQUIVO_FINANCEIRO, "rb");
     if (!fp) return NULL;
@@ -1589,6 +1613,8 @@ NodeTransacao* montar_lista_entradas_ordenadas() {
     return lista;
 }
 
+
+
 void liberar_lista_transacoes(NodeTransacao *lista) {
     NodeTransacao *aux;
 
@@ -1598,6 +1624,8 @@ void liberar_lista_transacoes(NodeTransacao *lista) {
         free(aux);
     }
 }
+
+
 
 void relatorio_maiores_entradas() {
     NodeTransacao *lista;
@@ -1640,6 +1668,8 @@ void relatorio_maiores_entradas() {
     pausar();
 }
 
+
+
 NodeTransacao* montar_lista_saidas_ordenadas() {
     FILE *fp = fopen(ARQUIVO_FINANCEIRO, "rb");
     if (!fp) return NULL;
@@ -1678,6 +1708,8 @@ NodeTransacao* montar_lista_saidas_ordenadas() {
     fclose(fp);
     return lista;
 }
+
+
 
 void relatorio_maiores_saidas() {
     NodeTransacao *lista;
@@ -1719,6 +1751,8 @@ void relatorio_maiores_saidas() {
     liberar_lista_transacoes(lista);
     pausar();
 }
+
+
 
 void relatorio_fluxo_caixa_mensal() {
     FILE *arq;
@@ -1800,6 +1834,8 @@ void relatorio_fluxo_caixa_mensal() {
 
     pausar();
 }
+
+
 
 void relatorio_comparativo_pedidos_transacoes() {
     FILE *arq_ped, *arq_fin;
