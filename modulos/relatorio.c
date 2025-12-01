@@ -166,8 +166,7 @@ void exibindo_cardapio_por_categoria() {
         return;
     }
 
-    // 1 — LER ARQUIVO E INSERIR ORDENADO POR CATEGORIA
-    while (fread(&temp, sizeof(Itemcardapio), 1, arq_item) == 1) {
+    while (fread(&temp, sizeof(Itemcardapio), 1, arq_item) == 1) {     // 1 — MONTAR LISTA ORDENADA POR CATEGORIA
 
         if (temp.disponivel == 0)
             continue;
