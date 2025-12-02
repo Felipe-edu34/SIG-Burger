@@ -335,7 +335,7 @@ void procurar_item_por_categoria() {
 
     while (fread(item, sizeof(Itemcardapio), 1, arq_cardapio) == 1) {
 
-        if (strcasestr_custom(item->categoria, categoria_lida)) {
+        if (strcasestr_custom(item->categoria, categoria_lida) && item->disponivel == 1) {
             exibir_item_listagem(item);
         }
     }
@@ -1913,6 +1913,7 @@ void relatorio_comparativo_pedidos_transacoes() {
 
     pausar();
 }
+
 
 
 void relatorio() {
