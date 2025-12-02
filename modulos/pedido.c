@@ -264,8 +264,13 @@ void cadastrar_pedido() {
 }
 
 void listar_pedidos() {
+
     FILE *arq;
-    Pedido ped;
+    Pedido temp;
+
+    NodePedido *lista = NULL;
+    NodePedido *novo, *aux;
+
     int contador = 0;
 
     limpar_tela();
@@ -274,38 +279,63 @@ void listar_pedidos() {
     printf("╚══════════════════════════════════════════════════╝\n\n");
 
     arq = fopen(ARQUIVO_PEDIDOS, "rb");
-    if (arq == NULL) {
+    if (!arq) {
         printf("Nenhum pedido cadastrado ainda.\n");
+        pausar();
+        return;
+    }
+
+    while (fread(&temp, sizeof(Pedido), 1, arq) == 1) {
+
+        if (temp.ativo == 0)
+            continue;
+
+        novo = (NodePedido*) malloc(sizeof(NodePedido));
+        novo->dado = temp;
+
+        novo->prox = lista;
+        lista = novo;
+    }
+
+    fclose(arq);
+
+    if (lista == NULL) {
+        printf("Nenhum pedido ativo encontrado.\n");
         pausar();
         return;
     }
 
     printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
 
-    while (fread(&ped, sizeof(Pedido), 1, arq) == 1) {
-        if (ped.ativo == 1) {
-            contador++;
-            printf("Pedido #%d\n", ped.numero_pedido);
-            printf("Cliente: %s\n", ped.nome_cliente);
-            printf("Telefone: %s\n", ped.telefone_cliente);
-            printf("Tipo: %s\n", ped.eh_delivery ? "DELIVERY" : "CONSUMO NO LOCAL");
-            printf("Data: %s\n", ped.data);
-            printf("Status: %s\n", ped.status);
-            printf("Total de Itens: %d\n", ped.total_itens);
-            printf("Valor: R$ %.2f\n", ped.valor_total);
-            printf("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
-        }
+    aux = lista;
+    while (aux != NULL) {
+
+        contador++;
+
+        printf("Pedido #%d\n", aux->dado.numero_pedido);
+        printf("Cliente: %s\n", aux->dado.nome_cliente);
+        printf("Telefone: %s\n", aux->dado.telefone_cliente);
+        printf("Tipo: %s\n", aux->dado.eh_delivery ? "DELIVERY" : "CONSUMO NO LOCAL");
+        printf("Data: %s\n", aux->dado.data);
+        printf("Status: %s\n", aux->dado.status);
+        printf("Total de Itens: %d\n", aux->dado.total_itens);
+        printf("Valor: R$ %.2f\n", aux->dado.valor_total);
+
+        printf("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n");
+
+        aux = aux->prox;
     }
 
-    fclose(arq);
-
-    if (contador == 0) {
-        printf("Nenhum pedido ativo encontrado.\n");
-    } else {
-        printf("Total de pedidos: %d\n", contador);
-    }
+    printf("Total de pedidos: %d\n", contador);
 
     pausar();
+
+    aux = lista;
+    while (lista != NULL) {
+        lista = lista->prox;
+        free(aux);
+        aux = lista;
+    }
 }
 
 void editar_pedido() {
